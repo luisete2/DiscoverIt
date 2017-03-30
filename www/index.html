@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<!--HTML5 doctype-->
+<html>
+    <head>
+        <title>Tab View Template</title>
+        <meta content="text/html; charset=utf-8" http-equiv="Content-type">
+        <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=0, minimal-ui" name="viewport">
+        <meta content="yes" name="apple-mobile-web-app-capable"/>
+        <meta content="no-cache" http-equiv="Pragma">
+        <meta content="IE=edge" http-equiv="X-UA-Compatible"/>
+        <link href="lib/appframework/icons.css" rel="stylesheet" type="text/css"/>
+        <link href="lib/appframework/af.ui.css" rel="stylesheet" type="text/css"/>
+        <link href="style.css" rel="stylesheet" type="text/css"/>
+        <script src="https://use.fontawesome.com/9aa9f12b68.js"></script>
+        <script charset="utf-8" src="lib/jquery.min.js" type="text/javascript"></script>
+        <script charset="utf-8" src='lib/jquery.cloudinary.js' type='text/javascript'></script>
+        <script charset="utf-8" src="lib/fastclick.min.js" type="text/javascript"></script>
+        <script charset="utf-8" src="lib/appframework/appframework.ui.min.js" type="text/javascript"></script>
+        <script src="http://maps.googleapis.com/maps/api/js?key=AIzaSyCUTg59OdxJKdSgeIo5qiUDUZM2AyNK8RQ&sensor=TRUE&callback=initMap&libraries=places"></script>
+        <script charset="utf-8" src="lib/geolocation-marker.js" type="text/javascript"></script>
+        <script src="cordova.js"></script>
+    </head>
+    <body>
+        <div class="ui-loader heavy" id="splashscreen">
+            App Framework - Tab View
+            <br>
+            <br>
+            <span class="ui-icon ui-icon-loading spin"></span>
+            <h1>Starting app</h1>
+        </div>
+        <div class="view">
+            <header>
+                <h1>Title</h1>
+            </header>
+            <div class="pages">
+                <!--Tab View Pages-->
+                <div class="panel" data-title="Mapa" id="tab1">
+                    <div id="mapa_div"></div>
+                    <a href="#search"><i class="fa fa-search fa-3x" aria-hidden="true" style="position: absolute; top: 2%; right: 3%;" id="searchIcon"></i></a>
+                    <a href="#user"><i class="fa fa-user fa-3x" aria-hidden="true" style="position: absolute; bottom: 2%; right: 3%;" id="userIcon"></i></a>
+                    <i class="fa fa-location-arrow fa-3x" aria-hidden="true"  style="position: absolute; bottom: 2%; left: 3%;" id="locationIcon"></i>
+                </div>
+                <div class="panel" data-title="Cámara" id="tab2">
+                    <div style="text-align:center;">
+                        <div class="button" style="width:80%" onclick="takePicture()"><i class="fa fa-camera fa-5x"></i><br>Sacar foto</div>
+                        <div class="button" style="width:80%" onclick="importPicture(pictureSource.SAVEDPHOTOALBUM)"><i class="fa fa-picture-o fa-5x"></i><br>Coger foto de carrete</div>
+                        <!--<img src="" id="photo" style="width: 300px; height:350px;"/><br>-->
+                    </div>
+                </div>
+                <div class="panel" data-title="Rutas" id="tab3">
+                    Aqui van las rutas
+                </div>
+                <div class="panel" data-title="Agenda" id="tab4">
+                    Aqui va la agenda
+                </div>
+                <div class="panel" data-title="Búsqueda" id="search">
+                    <input type="text" id="buscarS" placeholder="Buscar...">
+                </div>
+                <div class="panel" data-title="Usuario" id="user">
+                    aqui van los datos del usuario
+                </div>
+            </div>
+            <footer>
+                <a href="#tab1" onclick="$.afui.clearHistory()">
+                    <i aria-hidden="true" class="fa fa-map fa-2x"></i>
+                    <br>Mapa
+                </a>
+                <a href="#tab2" onclick="$.afui.clearHistory()">
+                    <i aria-hidden="true" class="fa fa-camera fa-2x"></i>
+                    <br>Cámara
+                </a>
+                <a href="#tab3" onclick="$.afui.clearHistory()">
+                    <i aria-hidden="true" class="fa fa-map-signs fa-2x"></i>
+                    <br>Rutas
+                </a>
+                <a href="#tab4" onclick="$.afui.clearHistory()">
+                    <i aria-hidden="true" class="fa fa-calendar fa-2x"></i>
+                    <br>Agenda
+                </a>
+            </footer>
+        </div>
+    </body>
+    <script charset="utf-8" src="scripts/di_callService.js" type="text/javascript"></script>
+    <script charset="utf-8" src="scripts/di_basicFunctions.js" type="text/javascript"></script>
+</html>
