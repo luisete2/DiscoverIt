@@ -30,10 +30,16 @@
         },
         "buildfire-cordova-plugin-calendar": {
             "PACKAGE_NAME": "io.cordova.hellocordova"
+        },
+        "com-badrit-base64": {
+            "PACKAGE_NAME": "io.cordova.hellocordova"
         }
     },
     "dependent_plugins": {
         "cordova-plugin-compat": {
+            "PACKAGE_NAME": "io.cordova.hellocordova"
+        },
+        "cordova-plugin-device": {
             "PACKAGE_NAME": "io.cordova.hellocordova"
         }
     }

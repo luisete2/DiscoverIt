@@ -3,6 +3,7 @@
 }
 .panel { 
     margin:0; padding:0; border:0;
+    text-align:center;
 }
 #searchIcon{
     color:black;
@@ -10,19 +11,57 @@
 #userIcon{
     color:black;
 }
+#locationIcon{
+    color:black;
+}
+button.accordion {
+    background-color: #eee;
+    color: #444;
+    cursor: pointer;
+    width: 100%;
+    padding: 10px;
+    text-align: left;
+    border-style: solid;
+    border-width: 1px;
+    outline: none;
+    transition: 0.4s;
+}
+
+/* Add a background color to the button if it is clicked on (add the .active class with JS), and when you move the mouse over it (hover) */
+button.accordion.active, button.accordion:hover {
+    background-color: #ddd;
+}
+button.accordion:after {
+    font-size: 13px;
+    color: #777;
+    float: right;
+    margin-left: 5px;
+}
+
+button.accordion.active:after {
+}
+
+/* Style the accordion panel. Note: hidden by default */
+div.panelAcc {
+    padding: 0 18px;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.2s ease-out;
+}
 /******************GLOBAL**************************/
 @-ms-viewport{
   width: device-width;
   height: device-height;
 }
-.button{
-    text-align: center;
-}
+
 a[href^="http://maps.google.com/maps"]{display:none !important}
 a[href^="https://maps.google.com/maps"]{display:none !important}
 
 .gmnoprint a, .gmnoprint span, .gm-style-cc {
     display:none;
+}
+.button{
+    text-align: center;
 }
 .gmnoprint div {
     background:none !important;

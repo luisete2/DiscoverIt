@@ -34,52 +34,75 @@
             </header>
             <div class="pages">
                 <!--Tab View Pages-->
-                <div class="panel" data-title="Mapa" id="tab1">
+                <div class="panel" data-title="Mapa" id="mapPage">
                     <div id="mapa_div"></div>
-                    <a href="#search"><i class="fa fa-search fa-3x" aria-hidden="true" style="position: absolute; top: 2%; right: 3%;" id="searchIcon"></i></a>
-                    <a href="#user"><i class="fa fa-user fa-3x" aria-hidden="true" style="position: absolute; bottom: 2%; right: 3%;" id="userIcon"></i></a>
+                    <a href="#searchPage"><i class="fa fa-search fa-3x" aria-hidden="true" style="position: absolute; top: 2%; right: 3%;" id="searchIcon"></i></a>
+                    <a href="#userPage"><i class="fa fa-user fa-3x" aria-hidden="true" style="position: absolute; bottom: 2%; right: 3%;" id="userIcon"></i></a>
                     <i class="fa fa-location-arrow fa-3x" aria-hidden="true"  style="position: absolute; bottom: 2%; left: 3%;" id="locationIcon"></i>
+                    <span class="fa-stack fa-lg" style="position: absolute; bottom: 10%; left: 3%; display:none;" id="cleanMarkersIcon">
+                        <i class="fa fa-map-marker fa-stack-2x"></i>
+                        <i class="fa fa-times fa-stack-2x" style="color:red;"></i>
+                    </span>
                 </div>
-                <div class="panel" data-title="Cámara" id="tab2">
+                <div class="panel" data-title="Cámara" id="cameraPage">
                     <div style="text-align:center;">
                         <div class="button" style="width:80%" onclick="takePicture()"><i class="fa fa-camera fa-5x"></i><br>Sacar foto</div>
                         <div class="button" style="width:80%" onclick="importPicture(pictureSource.SAVEDPHOTOALBUM)"><i class="fa fa-picture-o fa-5x"></i><br>Coger foto de carrete</div>
                         <!--<img src="" id="photo" style="width: 300px; height:350px;"/><br>-->
                     </div>
                 </div>
-                <div class="panel" data-title="Rutas" id="tab3">
+                <div class="panel" data-title="Rutas" id="routesPage">
                     Aqui van las rutas
                 </div>
-                <div class="panel" data-title="Agenda" id="tab4">
+                <div class="panel" data-title="Agenda" id="calendarPage">
                     Aqui va la agenda
                 </div>
-                <div class="panel" data-title="Búsqueda" id="search">
-                    <input type="text" id="buscarS" placeholder="Buscar...">
+                <div class="panel" data-title="Búsqueda" id="searchPage">
+                    <button class="accordion" id="B1">Búsqueda simple</button>
+                    <div class="panelAcc">
+                        <p>Palabras clave</p>
+                        <input type="text" id="B1Keywords"><br>
+                        <p>Pais</p>
+                        <input type="text" id="B1Country"><br>
+                        <p>Ciudad</p>
+                        <input type="text" id="B1City"><br>
+                        <p>Tipo</p>
+                        <input type="select" id="B1Type"><br>
+                    </div>
+                    <button class="accordion" id="B2">Búsqueda por cercanía</button>
+                    <div class="panelAcc">
+                        <p>Introduce un rango de cercanía</p>
+                        <input style="width:90%" type="range" id="B2In" value="500" min="100" max="3000" oninput="B2Out.value = B2In.value+' m'"><br>
+                        <output id="B2Out">500 m</output><br>
+                        <p>Tipo</p>
+                        <input type="select" id="B2Type">
+                    </div>
+                    <div class="button" id="searchButton" onclick="searchPlace();"><i class="fa fa-map-o fa-lg"></i> Buscar en el mapa</div>
                 </div>
-                <div class="panel" data-title="Usuario" id="user">
+                <div class="panel" data-title="Usuario" id="userPage">
                     aqui van los datos del usuario
                 </div>
             </div>
             <footer>
-                <a href="#tab1" onclick="$.afui.clearHistory()">
+                <a href="#mapPage" onclick="$.afui.clearHistory()">
                     <i aria-hidden="true" class="fa fa-map fa-2x"></i>
                     <br>Mapa
                 </a>
-                <a href="#tab2" onclick="$.afui.clearHistory()">
+                <a href="#cameraPage" onclick="$.afui.clearHistory()">
                     <i aria-hidden="true" class="fa fa-camera fa-2x"></i>
                     <br>Cámara
                 </a>
-                <a href="#tab3" onclick="$.afui.clearHistory()">
+                <a href="#routesPage" onclick="$.afui.clearHistory()">
                     <i aria-hidden="true" class="fa fa-map-signs fa-2x"></i>
                     <br>Rutas
                 </a>
-                <a href="#tab4" onclick="$.afui.clearHistory()">
+                <a href="#calendarPage" onclick="$.afui.clearHistory()">
                     <i aria-hidden="true" class="fa fa-calendar fa-2x"></i>
                     <br>Agenda
                 </a>
             </footer>
         </div>
     </body>
-    <script charset="utf-8" src="scripts/di_callService.js" type="text/javascript"></script>
+    <script charset="utf-8" src="scripts/di_uiFunctions.js" type="text/javascript"></script>
     <script charset="utf-8" src="scripts/di_basicFunctions.js" type="text/javascript"></script>
 </html>

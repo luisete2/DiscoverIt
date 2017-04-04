@@ -30,6 +30,9 @@
         },
         "buildfire-cordova-plugin-calendar": {
             "PACKAGE_NAME": "HelloCordova"
+        },
+        "com-badrit-base64": {
+            "PACKAGE_NAME": "HelloCordova"
         }
     },
     "dependent_plugins": {

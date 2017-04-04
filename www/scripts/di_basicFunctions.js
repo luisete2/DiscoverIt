@@ -6,18 +6,25 @@ function onDeviceReady() {
     window.StatusBar.show();
     window.StatusBar.backgroundColorByHexString('#000000');
     window.StatusBar.overlaysWebView(false);
+    document.getElementById('searchButton').disabled = true;
+}
+var iconPin = {
+    url: "location_marker.svg",
+    anchor: new google.maps.Point(25,50),
+    scaledSize: new google.maps.Size(50,50)
 }
 var map, marker, mousedUp = false;
 var geocoder = new google.maps.Geocoder;
 var infowindow = new google.maps.InfoWindow;
 var GeoMarker = new GeolocationMarker();
 var markerArray = [];
+var infoArray=[];
 //MAPA
 function initMap() {
     map = new google.maps.Map(document.getElementById('mapa_div'), {
         center: {
-            lat: -34.397,
-            lng: 150.644
+            lat: 40.415347,
+            lng: -3.707371
         },
         zoom: 10,
         mapTypeId: google.maps.MapTypeId.ROADMAP,
@@ -167,8 +174,65 @@ function initMap() {
                 //map.panTo(e.latLng);
             }
         }, 600);
-    });*/
-    
+    });
+    function getFileContentAsBase64(path,callback){
+    window.resolveLocalFileSystemURL(path, gotFile, fail);
+            
+    function fail(e) {
+          alert('Cannot found requested file');
+    }
+
+    function gotFile(fileEntry) {
+           fileEntry.file(function(file) {
+              var reader = new FileReader();
+              reader.onloadend = function(e) {
+                   var content = this.result;
+                   callback(content);
+              };
+              // The most important point, use the readAsDatURL Method from the file plugin
+              reader.readAsDataURL(file);
+           });
+    }
+}*/  
+}
+function cleanMarkers(){
+    for (var i = 0; i < markerArray.length; i++) {
+        markerArray[i].setMap(null);
+    }
+    markerArray.length=0;
+    document.getElementById('cleanMarkersIcon').style.display='none';
+}
+
+function searchPlace(){
+    if(typeQuery==0){
+        alert('NO TIPO');
+    }else if(typeQuery==1){
+        //CODIGO PARA BUSQUEDAS COMPLEJAS
+    }else{
+        var userPos=GeoMarker.getPosition().toUrlValue();
+        //CODIGO PARA BUSQUEDAS POR CERCANIA
+        $.post('http://192.168.1.41/DiscoverIt/www/php/di_placeQuerys.php', {tipo: typeQuery, radio: document.getElementById('B2In').value, location: userPos}, function(data, status){
+            cleanMarkers();
+            window.location.href='#mapPage';
+            infoArray=JSON.parse(data);
+            infoArray.forEach(function(k){
+                markerArray.push(new google.maps.Marker({
+                    position: {
+                        lat: k.latitud,
+                        lng: k.longitud
+                    },
+                    //icon: iconPin,
+                    map: map,
+                    animation: google.maps.Animation.DROP
+                }));
+            });
+            document.getElementById('cleanMarkersIcon').style.display='inline';
+        });
+        
+        //str = JSON.stringify(GeoMarker, null, 4); // (Optional) beautiful indented output.
+        //console.log(GeoMarker); // Displays output using window.alert()
+        //console.log(GeoMarker); // Displays output using window.alert()
+    }
 }
 function placeMarker(position){
     if(markerArray[0]){
@@ -214,44 +278,26 @@ $('#locationIcon').click(function(){
         map.setCenter(pos);
     });
 });
+$('#cleanMarkersIcon').click(function(){
+    cleanMarkers();
+});
 //FOTOS
 function onSuccess(imageURI){
-    getFileContentAsBase64(imageURI,function(base64Image){
+    /*getFileContentAsBase64(imageURI,function(base64Image){
         $.post('http://192.168.1.41/DiscoverIt/www/php/di_serverCamera.php', {imagen:base64Image}, function(data, status){
             alert("Data: " + data + "\nStatus: " + status);
         });
-});
-    
+    });*/
 }
 function onFail(message){
    console.log("Picture failure: " + message);
 }
 //Hacer foto con cámara
 function takePicture(){
-    navigator.camera.getPicture(onSuccess, onFail, { quality: 100, destinationType: destinationType.FILE_URI, saveToPhotoAlbum: false });
+    navigator.camera.getPicture(onSuccess, onFail, { quality: 1, destinationType: destinationType.FILE_URI, saveToPhotoAlbum: false });
 } 
 //Sacar foto de galería
 function importPicture(source){
-    navigator.camera.getPicture(onSuccess, onFail, { quality: 100, destinationType: destinationType.FILE_URI, sourceType: source });
+    navigator.camera.getPicture(onSuccess, onFail, { quality: 1, destinationType: destinationType.FILE_URI, sourceType: source });
 }
-function getFileContentAsBase64(path,callback){
-    window.resolveLocalFileSystemURL(path, gotFile, fail);
-            
-    function fail(e) {
-          alert('Cannot found requested file');
-    }
-
-    function gotFile(fileEntry) {
-           fileEntry.file(function(file) {
-              var reader = new FileReader();
-              reader.onloadend = function(e) {
-                   var content = this.result;
-                   callback(content);
-              };
-              // The most important point, use the readAsDatURL Method from the file plugin
-              reader.readAsDataURL(file);
-           });
-    }
-}
-
 initMap();

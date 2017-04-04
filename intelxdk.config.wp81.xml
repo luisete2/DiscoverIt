@@ -25,6 +25,7 @@
 <intelxdk:plugin intelxdk:name="Vibration" intelxdk:value="cordova-plugin-vibration" intelxdk:version="2.1.1" intelxdk:checksum="cf9984de" intelxdk:type="file"/>
 <intelxdk:plugin intelxdk:name="File" intelxdk:value="cordova-plugin-file" intelxdk:version="4.2.0" intelxdk:checksum="1fdd7f27" intelxdk:type="file"/>
 <intelxdk:plugin intelxdk:name="Calendar" intelxdk:value="buildfire-cordova-plugin-calendar" intelxdk:version="4.4.4" intelxdk:checksum="9fc67d44" intelxdk:type="file"/>
+<intelxdk:plugin intelxdk:name="Base64" intelxdk:value="com-badrit-base64" intelxdk:version="0.2.0" intelxdk:checksum="13cfd9ae" intelxdk:type="file"/>
 <preference name="Fullscreen" value="true"/>
 <platform name="windows">
 <preference name="Orientation" value="portrait"/></platform>
