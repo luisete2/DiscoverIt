@@ -14,32 +14,6 @@
 #locationIcon{
     color:black;
 }
-button.accordion {
-    background-color: #eee;
-    color: #444;
-    cursor: pointer;
-    width: 100%;
-    padding: 10px;
-    text-align: left;
-    border-style: solid;
-    border-width: 1px;
-    outline: none;
-    transition: 0.4s;
-}
-
-/* Add a background color to the button if it is clicked on (add the .active class with JS), and when you move the mouse over it (hover) */
-button.accordion.active, button.accordion:hover {
-    background-color: #ddd;
-}
-button.accordion:after {
-    font-size: 13px;
-    color: #777;
-    float: right;
-    margin-left: 5px;
-}
-
-button.accordion.active:after {
-}
 
 /* Style the accordion panel. Note: hidden by default */
 div.panelAcc {
@@ -65,4 +39,83 @@ a[href^="https://maps.google.com/maps"]{display:none !important}
 }
 .gmnoprint div {
     background:none !important;
+}
+.innerTabs a{
+    height: 100%;
+    font-size: 12px;
+    font-weight: normal;
+    text-decoration: none;
+    text-align: center;
+    -webkit-box-flex: 1;
+    -moz-box-flex: 1;
+    -ms-box-flex: 1;
+    box-flex: 1;
+    -webkit-flex: 1;
+    -moz-flex: 1;
+    -ms-flex: 1;
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
+    margin: 0;
+    padding: 0;
+    width:25%;
+    float:left;
+    border: 1px;
+}
+.innerTabs{
+    z-index: 180;
+    height: 49px;
+    display: block;
+    left: 0;
+    right: 0;
+    position: relative;
+    padding: 0 3px;
+    display: -webkit-box;
+    display: -moz-box;
+    display: box;
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: -moz-flex;
+    display: -ms-flex;
+    display: flex;
+    border: none;
+    box-shadow: none;
+}
+#search_accordion { 
+    width: 100%; 
+}
+#routes_accordion { 
+    width: 100%; 
+}
+
+.accordion_button {
+    cursor: pointer;
+    padding: 10px;
+    background-color: #eee;
+    color: #444;
+    text-align: left;
+    border-style: solid;
+    border-width: 1px;
+    outline: none;
+    transition: 0.4s;
+}
+.accordion_button.active, .accordion_button:hover {
+    background-color: #ddd;
+}
+    
+.accordion_content {
+    background-color: #EFEFEF;
+    display: none;
+    padding: 10px;
+    border-style: solid;
+    border-width: 1px;
+}
+
+.accordion_button:after {
+    font-size: 13px;
+    color: #777;
+    float: right;
+    margin-left: 5px;
 }
