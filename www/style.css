@@ -15,13 +15,6 @@
     color:black;
 }
 
-/* Style the accordion panel. Note: hidden by default */
-div.panelAcc {
-    padding: 0 18px;
-    max-height: 0;
-    overflow: hidden;
-    transition: max-height 0.2s ease-out;
-}
 /******************GLOBAL**************************/
 @-ms-viewport{
   width: device-width;
@@ -36,6 +29,7 @@ a[href^="https://maps.google.com/maps"]{display:none !important}
 }
 .button{
     text-align: center;
+    margin: 3px 20px;
 }
 .gmnoprint div {
     background:none !important;
@@ -83,13 +77,13 @@ a[href^="https://maps.google.com/maps"]{display:none !important}
     border: none;
     box-shadow: none;
 }
+/*ACCORDION*/
 #search_accordion { 
     width: 100%; 
 }
 #routes_accordion { 
     width: 100%; 
 }
-
 .accordion_button {
     cursor: pointer;
     padding: 10px;
@@ -108,7 +102,6 @@ a[href^="https://maps.google.com/maps"]{display:none !important}
 .accordion_content {
     background-color: #EFEFEF;
     display: none;
-    padding: 10px;
     border-style: solid;
     border-width: 1px;
 }
@@ -118,4 +111,36 @@ a[href^="https://maps.google.com/maps"]{display:none !important}
     color: #777;
     float: right;
     margin-left: 5px;
+}
+.routeMonList{
+    margin-top: 5px;
+	float : left;
+	clear : none;
+	width : 50%;
+    text-align: center;
+}
+.routeDesc{
+    margin-top: 5px;
+    float : left;
+	clear : none;
+	width : 50%;
+}
+.routeFooter{
+    margin-top: 5px;
+    clear : none;
+    width : 100%;
+    text-align: right;
+}
+ul{
+    width:90%; 
+    height:90%;
+    overflow:hidden; 
+    overflow-y:scroll; 
+    border-style: solid;
+    border-width: 1px;
+    background-color: white;
+    text-align: left;
+    margin-left: 5%;
+    margin-right: 5%;
+    padding-left: 2px;
 }

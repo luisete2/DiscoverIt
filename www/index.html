@@ -11,17 +11,18 @@
         <link href="lib/appframework/icons.css" rel="stylesheet" type="text/css"/>
         <link href="lib/appframework/af.ui.css" rel="stylesheet" type="text/css"/>
         <link href="style.css" rel="stylesheet" type="text/css"/>
+        <link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css" />
+        <script src="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
         <script src="https://use.fontawesome.com/9aa9f12b68.js"></script>
         <script src="lib/accordion.js"></script>
-        <!--<script charset="utf-8" src="lib/jquery.min.js" type="text/javascript"></script>-->
         <script charset="utf-8" src="lib/fastclick.min.js" type="text/javascript"></script>
         <script charset="utf-8" src="lib/appframework/appframework.ui.min.js" type="text/javascript"></script>
-        <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCUTg59OdxJKdSgeIo5qiUDUZM2AyNK8RQ&libraries=places&callback=initMap"></script>
+        <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?libraries=places&key=AIzaSyCUTg59OdxJKdSgeIo5qiUDUZM2AyNK8RQ"></script>
         <script charset="utf-8" src="lib/geolocation-marker.js" type="text/javascript"></script>
         <script src="cordova.js"></script>
     </head>
-    <body>
+    <body data-theme="b">
         <div class="ui-loader heavy" id="splashscreen">
             DiscoverIt - Descubre nuevos parajes!
             <br>
@@ -100,13 +101,11 @@
 		                <div class="accordion_button" onclick="typeQuery=1;">Búsqueda simple</div>
                         <div class="accordion_content"><p>Palabras clave</p>
                             <input type="text" id="B1Keywords"><br>
-                            <p>Pais</p>
-                            <input type="text" id="B1Country"><br>
                             <p>Ciudad</p>
                             <input type="text" id="B1City"><br>
                             <p>Tipo</p>
                             <select id="B1Type">
-                                <option disabled selected="selected">Selecciona un tipo...</option>
+                                <option selected="selected" value="">Ningún tipo seleccionado</option>
                                 <option value="museum">Museo</option>
                                 <option value="art_gallery">Galería de arte</option>
                                 <option value="bar">Bar</option>
@@ -137,7 +136,7 @@
                             <output id="B2Out">500 m</output><br>
                             <p>Tipo</p>
                             <select id="B2Type">
-                                <option disabled selected="selected">Selecciona un tipo...</option>
+                                <option selected="selected" value="">Ningún tipo seleccionado</option>
                                 <option value="museum">Museo</option>
                                 <option value="art_gallery">Galería de arte</option>
                                 <option value="bar">Bar</option>
