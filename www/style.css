@@ -1,10 +1,3 @@
-#mapa_div { 
-    width:100%; height: 100%; text-align: center;
-}
-.panel { 
-    margin:0; padding:0; border:0;
-    text-align:center;
-}
 #searchIcon{
     color:black;
 }
@@ -13,6 +6,9 @@
 }
 #locationIcon{
     color:black;
+}
+#mapa_div{
+    width: 100%; height: 100%; position: static !important;
 }
 
 /******************GLOBAL**************************/
@@ -27,55 +23,8 @@ a[href^="https://maps.google.com/maps"]{display:none !important}
 .gmnoprint a, .gmnoprint span, .gm-style-cc {
     display:none;
 }
-.button{
-    text-align: center;
-    margin: 3px 20px;
-}
 .gmnoprint div {
     background:none !important;
-}
-.innerTabs a{
-    height: 100%;
-    font-size: 12px;
-    font-weight: normal;
-    text-decoration: none;
-    text-align: center;
-    -webkit-box-flex: 1;
-    -moz-box-flex: 1;
-    -ms-box-flex: 1;
-    box-flex: 1;
-    -webkit-flex: 1;
-    -moz-flex: 1;
-    -ms-flex: 1;
-    flex: 1;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    display: block;
-    margin: 0;
-    padding: 0;
-    width:25%;
-    float:left;
-    border: 1px;
-}
-.innerTabs{
-    z-index: 180;
-    height: 49px;
-    display: block;
-    left: 0;
-    right: 0;
-    position: relative;
-    padding: 0 3px;
-    display: -webkit-box;
-    display: -moz-box;
-    display: box;
-    display: -ms-flexbox;
-    display: -webkit-flex;
-    display: -moz-flex;
-    display: -ms-flex;
-    display: flex;
-    border: none;
-    box-shadow: none;
 }
 /*ACCORDION*/
 #search_accordion { 
@@ -87,8 +36,6 @@ a[href^="https://maps.google.com/maps"]{display:none !important}
 .accordion_button {
     cursor: pointer;
     padding: 10px;
-    background-color: #eee;
-    color: #444;
     text-align: left;
     border-style: solid;
     border-width: 1px;
@@ -96,19 +43,17 @@ a[href^="https://maps.google.com/maps"]{display:none !important}
     transition: 0.4s;
 }
 .accordion_button.active, .accordion_button:hover {
-    background-color: #ddd;
 }
-    
 .accordion_content {
-    background-color: #EFEFEF;
     display: none;
     border-style: solid;
     border-width: 1px;
+    text-align: center;
+    padding: 5%;
 }
 
 .accordion_button:after {
-    font-size: 13px;
-    color: #777;
+    font-size: 13px
     float: right;
     margin-left: 5px;
 }
@@ -131,7 +76,7 @@ a[href^="https://maps.google.com/maps"]{display:none !important}
     width : 100%;
     text-align: right;
 }
-ul{
+ul.monList{
     width:90%; 
     height:90%;
     overflow:hidden; 

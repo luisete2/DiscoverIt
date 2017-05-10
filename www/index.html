@@ -1,192 +1,269 @@
 <!DOCTYPE html>
-<!--HTML5 doctype-->
 <html>
-    <head>
-        <title>Tab View Template</title>
-        <meta content="text/html; charset=utf-8" http-equiv="Content-type">
-        <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=0, minimal-ui" name="viewport">
-        <meta content="yes" name="apple-mobile-web-app-capable"/>
-        <meta content="no-cache" http-equiv="Pragma">
-        <meta content="IE=edge" http-equiv="X-UA-Compatible"/>
-        <link href="lib/appframework/icons.css" rel="stylesheet" type="text/css"/>
-        <link href="lib/appframework/af.ui.css" rel="stylesheet" type="text/css"/>
-        <link href="style.css" rel="stylesheet" type="text/css"/>
-        <link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css" />
-        <script src="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-        <script src="https://use.fontawesome.com/9aa9f12b68.js"></script>
-        <script src="lib/accordion.js"></script>
-        <script charset="utf-8" src="lib/fastclick.min.js" type="text/javascript"></script>
-        <script charset="utf-8" src="lib/appframework/appframework.ui.min.js" type="text/javascript"></script>
-        <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?libraries=places&key=AIzaSyCUTg59OdxJKdSgeIo5qiUDUZM2AyNK8RQ"></script>
-        <script charset="utf-8" src="lib/geolocation-marker.js" type="text/javascript"></script>
-        <script src="cordova.js"></script>
-    </head>
-    <body data-theme="b">
-        <div class="ui-loader heavy" id="splashscreen">
-            DiscoverIt - Descubre nuevos parajes!
-            <br>
-            <br>
-            <span class="ui-icon ui-icon-loading spin"></span>
-            <h1>Cargando...</h1>
+<head>
+    <title>DiscoverIt - Una nueva forma de viajar</title>
+    <meta content="text/html; charset=utf-8" http-equiv="Content-type">
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=0, minimal-ui" name="viewport">
+    <link href="lib/appframework/icons.css" rel="stylesheet" type="text/css"/>
+    <link href="lib/appframework/af.ui.css" rel="stylesheet" type="text/css"/>
+    <link rel="stylesheet" type="text/css" href="css/jquery.mobile.flatui.css" />
+    <link href="style.css" rel="stylesheet" type="text/css"/>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <script src="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+    <script src="https://use.fontawesome.com/9aa9f12b68.js"></script>
+    <script src="lib/accordion.js"></script>
+    <script charset="utf-8" src="lib/fastclick.min.js" type="text/javascript"></script>
+    <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?libraries=places&key=AIzaSyCUTg59OdxJKdSgeIo5qiUDUZM2AyNK8RQ"></script>
+    <script charset="utf-8" src="lib/geolocation-marker.js" type="text/javascript"></script>
+    <script src="cordova.js"></script>
+</head>
+<body>
+    <div data-role="page" id="mapPage" data-theme="b">
+        <div data-role="content" style="padding:0px;margin:0;">
+            <div id="mapa_div"></div>
+            <a href="#searchPage"><i class="fa fa-search fa-3x" aria-hidden="true" style="position: absolute; top: 2%; right: 3%;" id="searchIcon"></i></a>
+            <a href="#userPage"><i class="fa fa-user fa-3x" aria-hidden="true" style="position: absolute; bottom: 2%; right: 3%;" id="userIcon"></i></a>
+            <i class="fa fa-location-arrow fa-3x" aria-hidden="true" style="position: absolute; bottom: 2%; left: 3%;" id="locationIcon"></i>
+            <span class="fa-stack fa-lg" style="position: absolute; bottom: 10%; left: 3%; display:none;" id="cleanMarkersIcon">
+                <i class="fa fa-map-marker fa-stack-2x"></i>
+                <i class="fa fa-times fa-stack-2x" style="color:red;"></i>
+            </span>
+            <span class="fa-stack fa-lg" style="position: absolute; bottom: 10%; left: 3%; display:none;" id="cleanRouteIcon">
+                <i class="fa fa-map-signs fa-stack-2x"></i>
+                <i class="fa fa-times fa-stack-2x" style="color:red;"></i>
+            </span>
         </div>
-        <div class="view">
-            <header>
-                <h1>Title</h1>
-            </header>
-            <div class="pages">
-                <!--Tab View Pages-->
-                <div class="panel" data-title="Mapa" id="mapPage">
-                    <div id="mapa_div"></div>
-                    <a href="#searchPage"><i class="fa fa-search fa-3x" aria-hidden="true" style="position: absolute; top: 2%; right: 3%;" id="searchIcon"></i></a>
-                    <a href="#userPage"><i class="fa fa-user fa-3x" aria-hidden="true" style="position: absolute; bottom: 2%; right: 3%;" id="userIcon"></i></a>
-                    <i class="fa fa-location-arrow fa-3x" aria-hidden="true" style="position: absolute; bottom: 2%; left: 3%;" id="locationIcon"></i>
-                    <span class="fa-stack fa-lg" style="position: absolute; bottom: 10%; left: 3%; display:none;" id="cleanMarkersIcon">
-                        <i class="fa fa-map-marker fa-stack-2x"></i>
-                        <i class="fa fa-times fa-stack-2x" style="color:red;"></i>
-                    </span>
-                    <span class="fa-stack fa-lg" style="position: absolute; bottom: 10%; left: 3%; display:none;" id="cleanRouteIcon">
-                        <i class="fa fa-map-signs fa-stack-2x"></i>
-                        <i class="fa fa-times fa-stack-2x" style="color:red;"></i>
-                    </span>
-                </div>
-                <!--<div class="panel" data-title="Cámara" id="cameraPage">
-                    <div style="text-align:center;">
-                        <div class="button" style="width:80%" onclick="takePicture()"><i class="fa fa-camera fa-5x"></i><br>Sacar foto</div>
-                        <div class="button" style="width:80%" onclick="importPicture(pictureSource.SAVEDPHOTOALBUM)"><i class="fa fa-picture-o fa-5x"></i><br>Coger foto de carrete</div>
-                        <img src="" id="photo" style="width: 300px; height:350px;"/><br>
-                    </div>
-                </div>-->
-                <div class="panel" data-title="Rutas" id="routesPage">
-                    <div id="routes_accordion">
-                    </div>
-                    <!-- <div class="innerTabs">
-                        <a href="#popRoutesPage" onclick="$.afui.clearHistory()">
-                            <i aria-hidden="true"></i>
-                            <br>Populares
-                        </a>
-                        <a href="#closeRoutesPage" onclick="$.afui.clearHistory()">
-                            <i aria-hidden="true"></i>
-                            <br>Cercanas
-                        </a>
-                        <a href="#searchRoutesPage" onclick="$.afui.clearHistory()">
-                            <i aria-hidden="true"></i>
-                            <br>Buscar
-                        </a>
-                        <a href="#downRoutesPage" onclick="$.afui.clearHistory()">
-                            <i aria-hidden="true"></i>
-                            <br>Descargadas
-                        </a>
-                    </div>
-                    
-                        <div class="panel" id="popRoutesPage">
-                            aqui van las rutas populares
-                        </div>
-                        <div class="panel" id="closeRoutesPage">
-                            aqui van las rutas cercanas
-                        </div>
-                        <div class="panel" id="searchRoutesPage">
-                            aqui va la busqueda de rutas
-                        </div>
-                        <div class="panel" id="downRoutesPage">
-                            aqui van las rutas descargadas
-                        </div>-->
-                    
-                </div>
-                <div class="panel" data-title="Agenda" id="calendarPage">
-                    Aqui va la agenda
-                </div>
-                <div class="panel" data-title="Búsqueda" id="searchPage">
-                    <div id="search_accordion">
-		                <div class="accordion_button" onclick="typeQuery=1;">Búsqueda simple</div>
-                        <div class="accordion_content"><p>Palabras clave</p>
-                            <input type="text" id="B1Keywords"><br>
-                            <p>Ciudad</p>
-                            <input type="text" id="B1City"><br>
-                            <p>Tipo</p>
-                            <select id="B1Type">
-                                <option selected="selected" value="">Ningún tipo seleccionado</option>
-                                <option value="museum">Museo</option>
-                                <option value="art_gallery">Galería de arte</option>
-                                <option value="bar">Bar</option>
-                                <option value="cafe">Cafetería</option>
-                                <option value="amusement_park">Parque de atracciones</option>
-                                <option value="aquarium">Acuario</option>
-                                <option value="zoo">Zoológico</option>
-                                <option value="casino">Casino</option>
-                                <option value="cemetery">Cementerio</option>
-                                <option value="city_hall">Ayuntamiento</option>
-                                <option value="embassy">Embajada</option>
-                                <option value="church">Iglesia</option>
-                                <option value="hindu_temple">Templo hindú</option>
-                                <option value="synagogue">Sinagoga</option>
-                                <option value="mosque">Mezquita</option>
-                                <option value="library">Biblioteca</option>
-                                <option value="movie_theater">Cine</option>
-                                <option value="night_club">Discoteca</option>
-                                <option value="park">Parque</option>
-                                <option value="restaurant">Restaurante</option>
-                                <option value="stadium">Estadio deportivo</option>
-                                <option value="university">Universidad</option>
-                            </select><br>
-                        </div>
-                        <div class="accordion_button"  onclick="typeQuery=2;">Búsqueda por cercanía</div>
-                        <div class="accordion_content"><p>Introduce un rango de cercanía</p>
-                            <input style="width:90%" type="range" id="B2In" value="500" min="100" max="3000" oninput="B2Out.value = B2In.value+' m'"><br>
-                            <output id="B2Out">500 m</output><br>
-                            <p>Tipo</p>
-                            <select id="B2Type">
-                                <option selected="selected" value="">Ningún tipo seleccionado</option>
-                                <option value="museum">Museo</option>
-                                <option value="art_gallery">Galería de arte</option>
-                                <option value="bar">Bar</option>
-                                <option value="cafe">Cafetería</option>
-                                <option value="amusement_park">Parque de atracciones</option>
-                                <option value="aquarium">Acuario</option>
-                                <option value="zoo">Zoológico</option>
-                                <option value="casino">Casino</option>
-                                <option value="cemetery">Cementerio</option>
-                                <option value="city_hall">Ayuntamiento</option>
-                                <option value="embassy">Embajada</option>
-                                <option value="church">Iglesia</option>
-                                <option value="hindu_temple">Templo hindú</option>
-                                <option value="synagogue">Sinagoga</option>
-                                <option value="mosque">Mezquita</option>
-                                <option value="library">Biblioteca</option>
-                                <option value="movie_theater">Cine</option>
-                                <option value="night_club">Discoteca</option>
-                                <option value="park">Parque</option>
-                                <option value="restaurant">Restaurante</option>
-                                <option value="stadium">Estadio deportivo</option>
-                                <option value="university">Universidad</option>
-                            </select><br>
-                        </div>
-                    </div>
-                    <div class="button" id="searchButton" onclick="searchPlace();"><i class="fa fa-map fa-lg"></i> Buscar en el mapa</div>
-                </div>
-                <div class="panel" data-title="Usuario" id="userPage">
-                    aqui van los datos del usuario
-                </div>
+    </div>
+    <div data-role="page" id="searchPage" data-position="fixed" data-theme="b">
+        <div data-role="header">
+            <a data-rel="back" data-icon="carat-l">Volver</a>
+            <h1>Búsqueda</h1>
+        </div>
+        <div id="search_accordion">
+            <div class="accordion_button" onclick="typeQuery=1">Búsqueda simple</div>
+            <div class="accordion_content"><p>Palabras clave</p>
+                <input type="text" id="B1Keywords"><br>
+                <p>Ciudad</p>
+                <input type="text" id="B1City"><br>
+                <p>Tipo</p>
+                <select id="B1Type">
+                    <option selected="selected" value="">Ningún tipo seleccionado</option>
+                    <option value="museum">Museo</option>
+                    <option value="art_gallery">Galería de arte</option>
+                    <option value="bar">Bar</option>
+                    <option value="cafe">Cafetería</option>
+                    <option value="amusement_park">Parque de atracciones</option>
+                    <option value="aquarium">Acuario</option>
+                    <option value="zoo">Zoológico</option>
+                    <option value="casino">Casino</option>
+                    <option value="cemetery">Cementerio</option>
+                    <option value="city_hall">Ayuntamiento</option>
+                    <option value="embassy">Embajada</option>
+                    <option value="church">Iglesia</option>
+                    <option value="hindu_temple">Templo hindú</option>
+                    <option value="synagogue">Sinagoga</option>
+                    <option value="mosque">Mezquita</option>
+                    <option value="library">Biblioteca</option>
+                    <option value="movie_theater">Cine</option>
+                    <option value="night_club">Discoteca</option>
+                    <option value="park">Parque</option>
+                    <option value="restaurant">Restaurante</option>
+                    <option value="stadium">Estadio deportivo</option>
+                    <option value="university">Universidad</option>
+                </select><br>
             </div>
-            <footer>
-                <a href="#mapPage" onclick="$.afui.clearHistory()">
+            <div class="accordion_button" onclick="typeQuery=2">Búsqueda por cercanía</div>
+            <div class="accordion_content"><p>Introduce un rango de cercanía (metros)</p>
+                <input type="range" id="B2In" value="500" min="100" max="3000" data-highlight="true"><br>
+                <p>Tipo</p>
+                <select id="B2Type">
+                    <option selected="selected" value="">Ningún tipo seleccionado</option>
+                    <option value="museum">Museo</option>
+                    <option value="art_gallery">Galería de arte</option>
+                    <option value="bar">Bar</option>
+                    <option value="cafe">Cafetería</option>
+                    <option value="amusement_park">Parque de atracciones</option>
+                    <option value="aquarium">Acuario</option>
+                    <option value="zoo">Zoológico</option>
+                    <option value="casino">Casino</option>
+                    <option value="cemetery">Cementerio</option>
+                    <option value="city_hall">Ayuntamiento</option>
+                    <option value="embassy">Embajada</option>
+                    <option value="church">Iglesia</option>
+                    <option value="hindu_temple">Templo hindú</option>
+                    <option value="synagogue">Sinagoga</option>
+                    <option value="mosque">Mezquita</option>
+                    <option value="library">Biblioteca</option>
+                    <option value="movie_theater">Cine</option>
+                    <option value="night_club">Discoteca</option>
+                    <option value="park">Parque</option>
+                    <option value="restaurant">Restaurante</option>
+                    <option value="stadium">Estadio deportivo</option>
+                    <option value="university">Universidad</option>
+                </select><br>
+            </div>
+            <div class="accordion_button"  onclick="typeQuery=3;">Información sobre ciudad</div>
+            <div class="accordion_content">
+                <p>Ciudad</p>
+                <input type="text" id="B3City"><br>
+            </div>
+        </div>
+        <button class="ui-btn" id="searchButton" onclick="searchPlace()"><i class="fa fa-map fa-lg"></i> Buscar en el mapa</button>
+    </div>
+    <div data-role="page" id="userPage" data-theme="b">
+        aqui van los datos del usuario
+    </div>
+    <div data-role="page" id="routesPage" data-theme="b">
+        <div data-role="header">
+            <h1>Rutas</h1>
+        </div> 
+        <div id="routes_accordion"></div>
+    </div>
+    <div data-role="page" id="calendarPage" data-theme="b">
+        <div data-role="header">
+            <h1>Page Title</h1>
+        </div><!-- /header -->
+        Aqui va la agenda
+    </div>
+    <div data-role="footer" data-position="fixed" data-theme="b" data-tap-toggle="false">
+        <div data-role="navbar">
+            <ul>
+                <li><a href="#mapPage" data-ajax="false">
                     <i aria-hidden="true" class="fa fa-map fa-2x"></i>
                     <br>Mapa
-                </a>
-                <!--<a href="#cameraPage" onclick="$.afui.clearHistory()">
+                </a></li>
+                <!--<li><a href="#cameraPage" data-ajax="false">
                     <i aria-hidden="true" class="fa fa-camera fa-2x"></i>
                     <br>Cámara
-                </a>-->
-                <a href="#routesPage" onclick="$.afui.clearHistory()">
+                </a></li>-->
+                <li><a href="#routesPage" data-ajax="false">
                     <i aria-hidden="true" class="fa fa-map-signs fa-2x"></i>
                     <br>Rutas
-                </a>
-                <a href="#calendarPage" onclick="$.afui.clearHistory()">
+                </a></li>
+                <li><a href="#calendarPage" data-ajax="false">
                     <i aria-hidden="true" class="fa fa-calendar fa-2x"></i>
                     <br>Agenda
-                </a>
-            </footer>
+                </a></li>
+            </ul>
+        </div><!-- /navbar -->
+    </div>
+    
+    
+    
+  <!--<div data-role="page">
+    <div data-role="panel" id="panel" data-position="right" data-theme="a" data-display="push"></div>
+
+    <div data-role="header">
+      <a data-iconpos="notext" data-role="button" data-icon="home" title="Home">Home</a>
+      <h1>A</h1>
+      <a data-iconpos="notext" href="#panel" data-role="button" data-icon="flat-menu"></a>
+    </div>
+
+    <div data-role="content" role="main">
+      <p>Sample text and <a href="#">links</a>.</p>
+      <fieldset class="ui-grid-a">
+        <div class="ui-block-a"><button data-icon="flat-settings" data-theme="a">Button A</button></div>
+        <div class="ui-block-b"><button data-icon="flat-new" data-theme="b">Button B</button></div>
+      </fieldset>
+      <fieldset class="ui-grid-a">
+        <div class="ui-block-a"><button data-icon="flat-man" data-theme="c">Button C</button></div>
+        <div class="ui-block-b"><button data-icon="flat-mail" data-theme="d">Button D</button></div>
+      </fieldset>
+      <fieldset class="ui-grid-a">
+        <div class="ui-block-a"><button data-icon="flat-lock" data-theme="e">Button E</button></div>
+        <div class="ui-block-b"><button data-icon="flat-menu" data-theme="f">Button F</button></div>
+      </fieldset>
+      <fieldset class="ui-grid-a">
+        <div class="ui-block-a"><button data-icon="flat-heart" data-theme="g">Button G</button></div>
+      </fieldset>
+
+      <ul data-role="listview" data-inset="true">
+        <li data-role="list-divider" data-theme="a">List Header</li>
+        <li>Read-only list item</li>
+        <li><a href="#">Linked list item</a></li>
+      </ul>
+
+      <div data-role="collapsible-set" data-theme="b" data-content-theme="b">
+        <div data-role="collapsible" data-collapsed-icon="flat-time" data-expanded-icon="flat-cross" data-collapsed="false">
+          <h3>Section 1</h3>
+          <p>I'm the collapsible content for section 1</p>
         </div>
+        <div data-role="collapsible" data-collapsed-icon="flat-calendar" data-expanded-icon="flat-cross">
+          <h3>Section 2</h3>
+          <p>I'm the collapsible content for section 2</p>
+        </div>
+        <div data-role="collapsible" data-collapsed-icon="flat-settings" data-expanded-icon="flat-cross">
+          <h3>Section 3</h3>
+          <p>I'm the collapsible content for section 3</p>
+        </div>
+      </div>
+
+      <div data-role="fieldcontain">
+        <fieldset data-role="controlgroup">
+          <input type="radio" name="radio-choice-a" data-theme="c" id="radio-choice-1-a" value="choice-1" checked="checked" />
+          <label for="radio-choice-1-a">Radio 1</label>
+
+          <input type="radio" name="radio-choice-a" data-theme="c" id="radio-choice-1-b" value="choice-2"  />
+          <label for="radio-choice-1-b">Radio 2</label>
+          <input type="checkbox" name="checkbox-a" data-theme="c" id="checkbox-a" checked="checked" />
+          <label for="checkbox-a">Checkbox</label>
+        </fieldset>
+      </div>
+
+      <div data-role="fieldcontain">
+        <a href="#" data-role="button" data-icon="home" data-iconpos="notext" data-theme="b" data-inline="true">Home</a>
+        <a href="#" data-role="button" data-icon="flat-video" data-iconpos="notext" data-theme="b" data-inline="true">Video</a>
+        <a href="#" data-role="button" data-icon="flat-time" data-iconpos="notext" data-theme="b" data-inline="true">Time</a>
+        <a href="#" data-role="button" data-icon="flat-settings" data-iconpos="notext" data-theme="b" data-inline="true">Settings</a>
+        <a href="#" data-role="button" data-icon="flat-plus" data-iconpos="notext" data-theme="b" data-inline="true">Plus</a>
+        <a href="#" data-role="button" data-icon="flat-new" data-iconpos="notext" data-theme="b" data-inline="true">New</a>
+        <a href="#" data-role="button" data-icon="flat-menu" data-iconpos="notext" data-theme="b" data-inline="true">Menu</a>
+        <a href="#" data-role="button" data-icon="flat-man" data-iconpos="notext" data-theme="b" data-inline="true">Man</a>
+        <a href="#" data-role="button" data-icon="flat-mail" data-iconpos="notext" data-theme="b" data-inline="true">Mail</a>
+        <a href="#" data-role="button" data-icon="flat-lock" data-iconpos="notext" data-theme="b" data-inline="true">Lock</a>
+        <a href="#" data-role="button" data-icon="flat-location" data-iconpos="notext" data-theme="b" data-inline="true">Location</a>
+        <a href="#" data-role="button" data-icon="flat-heart" data-iconpos="notext" data-theme="b" data-inline="true">Heart</a>
+        <a href="#" data-role="button" data-icon="flat-eye" data-iconpos="notext" data-theme="b" data-inline="true">Eye</a>
+        <a href="#" data-role="button" data-icon="flat-cross" data-iconpos="notext" data-theme="b" data-inline="true">Cross</a>
+        <a href="#" data-role="button" data-icon="flat-cmd" data-iconpos="notext" data-theme="b" data-inline="true">Cmd</a>
+        <a href="#" data-role="button" data-icon="flat-checkround" data-iconpos="notext" data-theme="b" data-inline="true">Checkround</a>
+        <a href="#" data-role="button" data-icon="flat-calendar" data-iconpos="notext" data-theme="b" data-inline="true">Calendar</a>
+        <a href="#" data-role="button" data-icon="flat-bubble" data-iconpos="notext" data-theme="b" data-inline="true">Bubble</a>
+        <a href="#" data-role="button" data-icon="flat-volume" data-iconpos="notext" data-theme="b" data-inline="true">Volume</a>
+        <a href="#" data-role="button" data-icon="flat-camera" data-iconpos="notext" data-theme="b" data-inline="true">Camera</a>
+      </div>
+
+      <select name="flip-1" id="flip-1" data-role="slider">
+        <option value="off">Off</option>
+        <option value="on" selected>On</option>
+      </select>
+
+      <div data-role="fieldcontain">
+        <div data-role="controlgroup" data-type="horizontal">
+          <a href="#" data-icon="flat-mail" data-theme="a" data-iconpos="notext" data-role="button">Yes</a>
+          <a href="#" data-icon="flat-camera" data-theme="a" data-iconpos="notext" data-role="button">Yes</a>
+          <a href="#" data-icon="flat-heart" data-theme="a" data-iconpos="notext" data-role="button">Yes</a>
+          <a href="#" data-icon="flat-eye" data-theme="a" data-iconpos="notext" data-role="button">Yes</a>
+        </div>
+      </div>
+
+      <div data-role="fieldcontain">
+        <select name="select-choice" id="select-choice-a" data-native-menu="false" data-theme="a">
+          <option value="standard">Option 1</option>
+          <option value="rush">Option 2</option>
+          <option value="express">Option 3</option>
+          <option value="overnight">Option 4</option>
+        </select>
+      </div>
+
+      <input type="text" placeholder="Text Input" />
+      <div data-role="fieldcontain">
+        <input type="range" name="slider" value="50" min="0" max="100" data-highlight="true" />
+      </div>
+    </div>
+  </div>
+
+        <div id="highlight"> </div>-->
+        <script charset="utf-8" src="scripts/di_basicFunctions.js" type="text/javascript"></script>
     </body>
-    <script charset="utf-8" src="scripts/di_basicFunctions.js" type="text/javascript"></script>
 </html>

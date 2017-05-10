@@ -1,13 +1,12 @@
 document.addEventListener("deviceready", onDeviceReady, false);
-
 function onDeviceReady() {
     pictureSource = navigator.camera.PictureSourceType;
     destinationType = navigator.camera.DestinationType;
     //intel.xdk.device.setRotateOrientation('portrait');
-    window.StatusBar.show();
+    //window.StatusBar.show();
     window.StatusBar.backgroundColorByHexString('#000000');
     window.StatusBar.overlaysWebView(false);
-    document.getElementById('searchButton').disabled = true;
+    //document.getElementById('searchButton').disabled = true;
     //google.maps.event.addDomListener(window, 'load', initMap);
 }
 var iconPin = {
@@ -23,6 +22,7 @@ var markerArray = [];
 var routesArray = [];
 var infoWindow= new google.maps.InfoWindow;
 var autocomplete = new google.maps.places.Autocomplete(document.getElementById('B1City'),{types: ['(cities)']});
+var autocomplete2 = new google.maps.places.Autocomplete(document.getElementById('B3City'),{types: ['(cities)']});
 
 //MAPA
 function initMap() {
@@ -138,18 +138,19 @@ function initMap() {
                 lat: position.coords.latitude,
                 lng: position.coords.longitude
             };
-            map.setCenter(pos);
+            map.panTo(pos);
             GeoMarker.setCircleOptions({
                 fillColor: '#808080'
             });
             google.maps.event.addListenerOnce(GeoMarker, 'position_changed', function() {
-                map.setCenter(this.getPosition());
+                map.panTo(this.getPosition());
                 map.fitBounds(this.getBounds());
             });
             google.maps.event.addListener(GeoMarker, 'geolocation_error', function(e) {
                 alert('There was an error obtaining your position. Message: ' + e.message);
             });
             GeoMarker.setMap(map);
+            console.log(GeoMarker);
         }, function() {
             handleLocationError(true, infoWindow, map.getCenter());
         });
@@ -159,6 +160,9 @@ function initMap() {
     }
     google.maps.event.addListener(autocomplete, 'place_changed', function(){
         var place = autocomplete.getPlace();
+    });
+    google.maps.event.addListener(autocomplete2, 'place_changed', function(){
+        var place = autocomplete2.getPlace();
     });
     /*
     map.addListener('mouseup', function(e){ 
@@ -191,9 +195,13 @@ function cleanMarkers() {
 }
 
 function searchPlace() {
+    setTimeout(function(){
+        $.mobile.loading('show');
+    },1);    
     if (typeQuery === 0) {
         alert('NO TIPO');
     } else if (typeQuery == 1) {
+        //INSERTAR LOADING
         //CODIGO PARA BUSQUEDAS COMPLEJAS
         if(!document.getElementById('B1Keywords').value){
             alert('Por favor, inserta palabras clave para realizar la busqueda.');
@@ -202,8 +210,8 @@ function searchPlace() {
         }else{
             geocoder.geocode( { 'address': document.getElementById('B1City').value}, function(results, status) {
                 if (status == 'OK') {
-                    map.setCenter(results[0].geometry.location);
-                    $.post('http://192.168.1.41/DiscoverIt/www/php/di_placeQuerys.php', {
+                    map.panTo(results[0].geometry.location);
+                    $.post('http://192.168.1.46/DiscoverIt/www/php/di_placeQuerys.php', {
                         tipoQuery: typeQuery,
                         lat: results[0].geometry.location.lat,
                         lng: results[0].geometry.location.lng,
@@ -238,20 +246,21 @@ function searchPlace() {
                     alert('La geolocalización de la ciudad ha fallado. Introduce una ciudad válida. '+status);
                 }
             });
-            
         }
     } else {
+        //INSERTAR LOADING
         var userPos = GeoMarker.getPosition();
         //CODIGO PARA BUSQUEDAS POR CERCANIA
-        $.post('http://192.168.1.41/DiscoverIt/www/php/di_placeQuerys.php', {
+        $.post('http://192.168.1.46/DiscoverIt/www/php/di_placeQuerys.php', {
             tipoQuery: typeQuery,
             radio: document.getElementById('B2In').value,
-            location: userPos,
+            lat: userPos.lat,
+            lng: userPos.lng,
             tipo: document.getElementById("B2Type").options[document.getElementById("B2Type").selectedIndex].value
         }, function(data, status) {
             cleanMarkers();
             window.location.href = '#mapPage';
-            map.setCenter(GeoMarker.getPosition());
+            map.panTo(GeoMarker.getPosition());
             var mdata = JSON.parse(data);
             mdata.forEach(function(k) {
                 var marker = new google.maps.Marker({
@@ -269,8 +278,14 @@ function searchPlace() {
                 });
                 markerArray.push(marker);
             });
+            directionsDisplay.setDirections({routes: []});
+            document.getElementById('cleanRouteIcon').style.display = 'none';
+            document.getElementById('cleanMarkersIcon').style.display = 'inline';
         });
     }
+    setTimeout(function(){
+        $.mobile.loading('hide');
+    },300);  
 }
 /*Metodo para sacar lugares de interes en busqueda cercana. hay que implementar
     alert('sumergise hijo de puta');
@@ -285,7 +300,7 @@ function searchPlace() {
                 alert('hemos hecho busqueda');
                 cleanMarkers();
                 window.location.href = '#mapPage';
-                map.setCenter(GeoMarker.getPosition());
+                map.panTo(GeoMarker.getPosition());
                 results.forEach(function(k) {
                     var marker = new google.maps.Marker({
                         position: k.geometry.location,
@@ -307,7 +322,9 @@ function searchPlace() {
             }
         });
 */
-
+$(function(){
+	$( "[data-role='footer']" ).toolbar();
+});
 function placeMarker(position) {
     if (markerArray[0]) {
         markerArray[0].setMap(null);
@@ -332,7 +349,7 @@ $('#locationIcon').click(function() {
             lat: position.coords.latitude,
             lng: position.coords.longitude
         };
-        map.setCenter(pos);
+        map.panTo(pos);
     });
 });
 $('#cleanMarkersIcon').click(function() {
@@ -345,7 +362,7 @@ $('#cleanRouteIcon').click(function() {
 //FOTOS
 function onSuccess(imageURI) {
     /*getFileContentAsBase64(imageURI,function(base64Image){
-        $.post('http://192.168.1.41/DiscoverIt/www/php/di_serverCamera.php', {imagen:base64Image}, function(data, status){
+        $.post('http://192.168.1.46/DiscoverIt/www/php/di_serverCamera.php', {imagen:base64Image}, function(data, status){
             alert("Data: " + data + "\nStatus: " + status);
         });
     });*/
@@ -387,7 +404,7 @@ function setRoute(routeId){
 }
 function getRoutes(){
     //alert('entramos');
-    $.post('http://192.168.1.41/DiscoverIt/www/php/di_routeLoader.php', {}, function(data, status) {
+    $.post('http://192.168.1.46/DiscoverIt/www/php/di_routeLoader.php', {}, function(data, status) {
         var mdata = JSON.parse(data);
         mdata.forEach(function(k) {
             var lista="<li>"+k.gRoute.origin+"</li>";
@@ -399,10 +416,13 @@ function getRoutes(){
                 lista=lista.concat(waypoints, "<li>"+k.gRoute.destination+"</li>");
             }else lista=lista.concat("<li>"+k.gRoute.destination+"</li>");
             //hay que hacer query por cada id de monumento
-            $("#routes_accordion").append("<div class='accordion_button'>"+k.nombre+"</div><div class='accordion_content'><div class='routeMonList'><h4>Monumentos</h4>            <ul>"+lista+"</ul></div><div class='routeDesc'><h4>Descripción</h4>Esta es una ruta con encanto propio que sin duda dejara a aquellos que la realicen boqueabiertos por su belleza y su misterio.</div><div class='routeFooter'><div class='button' style='width: 40%;'><i class='fa fa-star-half-o fa-lg'></i> Valorar ruta</div><br><div class='button' style='width: 40%;' onclick='setRoute(\"" + k._id.$id + "\")'>Iniciar ruta</div></div></div>");
+            $("#routes_accordion").append("<div class='accordion_button'>"+k.nombre+"</div><div class='accordion_content'><div class='routeMonList'><h4>Monumentos</h4>            <ul class='monList'>"+lista+"</ul></div><div class='routeDesc'><h4>Descripción</h4>Esta es una ruta con encanto propio que sin duda dejara a aquellos que la realicen boqueabiertos por su belleza y su misterio.</div><div class='routeFooter'><div class='button' style='width: 40%;'><i class='fa fa-star-half-o fa-lg'></i> Valorar ruta</div><br><div class='button' style='width: 40%;' onclick='setRoute(\"" + k._id.$id + "\")'>Iniciar ruta</div></div></div>");
             routesArray[k._id.$id]=k; 
         });
     });
 }
-initMap();
-getRoutes();
+$('#mapPage').on("pagecreate",function(event){
+
+});
+    initMap();
+    getRoutes();

@@ -17,7 +17,7 @@
             $final[]=$element;
         }
     }else{
-        $url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=".$_REQUEST['location']."&radius=".$_REQUEST['radio']."&key=AIzaSyCUTg59OdxJKdSgeIo5qiUDUZM2AyNK8RQ";
+        $url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?&location=".$_REQUEST['lat'].",".$_REQUEST['lng']."&radius=".$_REQUEST['radio']."&key=AIzaSyCUTg59OdxJKdSgeIo5qiUDUZM2AyNK8RQ";
         if($_REQUEST['tipo']){
             $url=$url."&types=".$_REQUEST['tipo'];
         }
