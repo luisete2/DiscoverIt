@@ -18,114 +18,156 @@
     <script src="cordova.js"></script>
 </head>
 <body>
-    <div data-role="page" id="mapPage" data-theme="b">
-        <div data-role="content" style="padding:0px;margin:0;">
+    <div data-role="page" id="mapPage" data-theme="d">
+        <div data-role="content" style="padding:0">
             <div id="mapa_div"></div>
             <a href="#searchPage"><i class="fa fa-search fa-3x" aria-hidden="true" style="position: absolute; top: 2%; right: 3%;" id="searchIcon"></i></a>
             <a href="#userPage"><i class="fa fa-user fa-3x" aria-hidden="true" style="position: absolute; bottom: 2%; right: 3%;" id="userIcon"></i></a>
             <i class="fa fa-location-arrow fa-3x" aria-hidden="true" style="position: absolute; bottom: 2%; left: 3%;" id="locationIcon"></i>
-            <span class="fa-stack fa-lg" style="position: absolute; bottom: 10%; left: 3%; display:none;" id="cleanMarkersIcon">
+            <span class="fa-stack fa-lg" style="position: absolute; bottom: 12%; left: 3%; display:none;" id="cleanMarkersIcon">
                 <i class="fa fa-map-marker fa-stack-2x"></i>
                 <i class="fa fa-times fa-stack-2x" style="color:red;"></i>
             </span>
-            <span class="fa-stack fa-lg" style="position: absolute; bottom: 10%; left: 3%; display:none;" id="cleanRouteIcon">
+            <span class="fa-stack fa-lg" style="position: absolute; bottom: 12%; left: 3%; display:none;" id="cleanRouteIcon">
                 <i class="fa fa-map-signs fa-stack-2x"></i>
                 <i class="fa fa-times fa-stack-2x" style="color:red;"></i>
             </span>
         </div>
     </div>
-    <div data-role="page" id="searchPage" data-position="fixed" data-theme="b">
-        <div data-role="header">
+    <div data-role="page" id="searchPage" data-theme="d">
+        <div data-role="header" data-position="fixed" data-tap-toggle="false">
             <a data-rel="back" data-icon="carat-l">Volver</a>
             <h1>Búsqueda</h1>
         </div>
-        <div id="search_accordion">
-            <div class="accordion_button" onclick="typeQuery=1">Búsqueda simple</div>
-            <div class="accordion_content"><p>Palabras clave</p>
-                <input type="text" id="B1Keywords"><br>
-                <p>Ciudad</p>
-                <input type="text" id="B1City"><br>
-                <p>Tipo</p>
-                <select id="B1Type">
-                    <option selected="selected" value="">Ningún tipo seleccionado</option>
-                    <option value="museum">Museo</option>
-                    <option value="art_gallery">Galería de arte</option>
-                    <option value="bar">Bar</option>
-                    <option value="cafe">Cafetería</option>
-                    <option value="amusement_park">Parque de atracciones</option>
-                    <option value="aquarium">Acuario</option>
-                    <option value="zoo">Zoológico</option>
-                    <option value="casino">Casino</option>
-                    <option value="cemetery">Cementerio</option>
-                    <option value="city_hall">Ayuntamiento</option>
-                    <option value="embassy">Embajada</option>
-                    <option value="church">Iglesia</option>
-                    <option value="hindu_temple">Templo hindú</option>
-                    <option value="synagogue">Sinagoga</option>
-                    <option value="mosque">Mezquita</option>
-                    <option value="library">Biblioteca</option>
-                    <option value="movie_theater">Cine</option>
-                    <option value="night_club">Discoteca</option>
-                    <option value="park">Parque</option>
-                    <option value="restaurant">Restaurante</option>
-                    <option value="stadium">Estadio deportivo</option>
-                    <option value="university">Universidad</option>
-                </select><br>
+        <div data-role="content" style="padding:0">
+            <div id="search_accordion">
+                <div class="accordion_button" onclick="typeQuery=1">Búsqueda simple</div>
+                <div class="accordion_content"><p>Palabras clave</p>
+                    <input type="text" id="B1Keywords"><br>
+                    <p>Ciudad</p>
+                    <input type="text" id="B1City"><br>
+                    <p>Tipo</p>
+                    <select id="B1Type">
+                        <option selected="selected" value="">Ningún tipo seleccionado</option>
+                        <option value="museum">Museo</option>
+                        <option value="art_gallery">Galería de arte</option>
+                        <option value="bar">Bar</option>
+                        <option value="cafe">Cafetería</option>
+                        <option value="amusement_park">Parque de atracciones</option>
+                        <option value="aquarium">Acuario</option>
+                        <option value="zoo">Zoológico</option>
+                        <option value="casino">Casino</option>
+                        <option value="cemetery">Cementerio</option>
+                        <option value="city_hall">Ayuntamiento</option>
+                        <option value="embassy">Embajada</option>
+                        <option value="church">Iglesia</option>
+                        <option value="hindu_temple">Templo hindú</option>
+                        <option value="synagogue">Sinagoga</option>
+                        <option value="mosque">Mezquita</option>
+                        <option value="library">Biblioteca</option>
+                        <option value="movie_theater">Cine</option>
+                        <option value="night_club">Discoteca</option>
+                        <option value="park">Parque</option>
+                        <option value="restaurant">Restaurante</option>
+                        <option value="stadium">Estadio deportivo</option>
+                        <option value="university">Universidad</option>
+                    </select><br>
+                </div>
+                <div class="accordion_button" onclick="typeQuery=2">Búsqueda por cercanía</div>
+                <div class="accordion_content"><p>Introduce un rango de cercanía (metros)</p>
+                    <input type="range" id="B2In" value="500" min="100" max="3000" data-highlight="true"><br>
+                    <p>Tipo</p>
+                    <select id="B2Type">
+                        <option selected="selected" value="">Ningún tipo seleccionado</option>
+                        <option value="museum">Museo</option>
+                        <option value="art_gallery">Galería de arte</option>
+                        <option value="bar">Bar</option>
+                        <option value="cafe">Cafetería</option>
+                        <option value="amusement_park">Parque de atracciones</option>
+                        <option value="aquarium">Acuario</option>
+                        <option value="zoo">Zoológico</option>
+                        <option value="casino">Casino</option>
+                        <option value="cemetery">Cementerio</option>
+                        <option value="city_hall">Ayuntamiento</option>
+                        <option value="embassy">Embajada</option>
+                        <option value="church">Iglesia</option>
+                        <option value="hindu_temple">Templo hindú</option>
+                        <option value="synagogue">Sinagoga</option>
+                        <option value="mosque">Mezquita</option>
+                        <option value="library">Biblioteca</option>
+                        <option value="movie_theater">Cine</option>
+                        <option value="night_club">Discoteca</option>
+                        <option value="park">Parque</option>
+                        <option value="restaurant">Restaurante</option>
+                        <option value="stadium">Estadio deportivo</option>
+                        <option value="university">Universidad</option>
+                    </select><br>
+                </div>
+                <div class="accordion_button" onclick="typeQuery=3;">Información sobre ciudad</div>
+                <div class="accordion_content">
+                    <p>Ciudad</p>
+                    <input type="text" id="B3City"><br>
+                </div>
             </div>
-            <div class="accordion_button" onclick="typeQuery=2">Búsqueda por cercanía</div>
-            <div class="accordion_content"><p>Introduce un rango de cercanía (metros)</p>
-                <input type="range" id="B2In" value="500" min="100" max="3000" data-highlight="true"><br>
-                <p>Tipo</p>
-                <select id="B2Type">
-                    <option selected="selected" value="">Ningún tipo seleccionado</option>
-                    <option value="museum">Museo</option>
-                    <option value="art_gallery">Galería de arte</option>
-                    <option value="bar">Bar</option>
-                    <option value="cafe">Cafetería</option>
-                    <option value="amusement_park">Parque de atracciones</option>
-                    <option value="aquarium">Acuario</option>
-                    <option value="zoo">Zoológico</option>
-                    <option value="casino">Casino</option>
-                    <option value="cemetery">Cementerio</option>
-                    <option value="city_hall">Ayuntamiento</option>
-                    <option value="embassy">Embajada</option>
-                    <option value="church">Iglesia</option>
-                    <option value="hindu_temple">Templo hindú</option>
-                    <option value="synagogue">Sinagoga</option>
-                    <option value="mosque">Mezquita</option>
-                    <option value="library">Biblioteca</option>
-                    <option value="movie_theater">Cine</option>
-                    <option value="night_club">Discoteca</option>
-                    <option value="park">Parque</option>
-                    <option value="restaurant">Restaurante</option>
-                    <option value="stadium">Estadio deportivo</option>
-                    <option value="university">Universidad</option>
-                </select><br>
-            </div>
-            <div class="accordion_button"  onclick="typeQuery=3;">Información sobre ciudad</div>
-            <div class="accordion_content">
-                <p>Ciudad</p>
-                <input type="text" id="B3City"><br>
-            </div>
+            <button class="ui-btn" id="searchButton" onclick="searchPlace()"><i class="fa fa-search fa-lg"></i> Buscar en el mapa</button>
         </div>
-        <button class="ui-btn" id="searchButton" onclick="searchPlace()"><i class="fa fa-map fa-lg"></i> Buscar en el mapa</button>
     </div>
-    <div data-role="page" id="userPage" data-theme="b">
-        aqui van los datos del usuario
+    <div data-role="page" id="userPage" data-theme="d">
+        <div data-role="header" data-position="fixed" data-tap-toggle="false">
+            <a data-rel="back" data-icon="carat-l">Volver</a>
+            <h1>Usuario</h1>
+        </div>
+        <div data-role="content">
+            <fieldset class="ui-grid-a">
+                <div class="ui-block-a" style="width:30%;">
+                    <img id='userPhoto' src="avatar.jpg" style="border-radius: 15px;">
+                </div>
+                <div id='userName' class="ui-block-b" style="width:70%;">
+                    Antonio Rodriguez Dominguez
+                </div>
+                <div class="field-contain ui-block-a" style="width:100%;">
+                        <label for="email" style="width:30%; margin: 4px 0;">E-Mail</label>
+                        <input type="text" style="width:70%;" id="email" value="emailejemplo@correo.eso" readonly>	
+                </div>
+                <div class="field-contain ui-block-a" style="width:100%;">
+                        <label for="pass" style="width:30%; margin: 4px 0;">Password</label>
+                        <input type="password" style="width:70%;" id="pass" value="lolololol" readonly>
+                </div>
+            </fieldset>
+            <button class="ui-btn">Modificar datos</button>
+            <button class="ui-btn">Borrar cuenta</button>
+            <button class="ui-btn">Rutas favoritas</button>
+            <a data-role="button" class="ui-btn" href="#routeCreatorPage">Crear ruta</a>
+            <button class="ui-btn">Mis rutas</button>
+        </div>
     </div>
-    <div data-role="page" id="routesPage" data-theme="b">
-        <div data-role="header">
+    <div data-role="page" id="routesPage" data-theme="d">
+        <div data-role="header" data-position="fixed" data-tap-toggle="false">
             <h1>Rutas</h1>
         </div> 
-        <div id="routes_accordion"></div>
+        <div data-role="content" style="padding:0">
+            <div id="routes_accordion"></div>
+        </div>
     </div>
-    <div data-role="page" id="calendarPage" data-theme="b">
-        <div data-role="header">
-            <h1>Page Title</h1>
+    <div data-role="page" id="calendarPage" data-theme="d">
+        <div data-role="header" data-position="fixed" data-tap-toggle="false">
+            <h1>Calendario</h1>
         </div><!-- /header -->
         Aqui va la agenda
     </div>
-    <div data-role="footer" data-position="fixed" data-theme="b" data-tap-toggle="false">
+    <div data-role="page" id="routeCreatorPage" data-theme="d">
+        <div data-role="header" data-position="fixed" data-tap-toggle="false">
+            <a data-rel="back" data-icon="carat-l">Volver</a>
+            <h1>Creador de rutas</h1>
+        </div>
+        <div data-role="content" style="padding:0">
+            <div id="mapa_route"></div>
+        </div>
+        <div data-role="footer" data-position="fixed" data-tap-toggle="false">
+            aqui van las opciones del creador
+        </div>
+    </div>
+    <div data-role="footer" data-position="fixed" data-tap-toggle="false">
         <div data-role="navbar">
             <ul>
                 <li><a href="#mapPage" data-ajax="false">
