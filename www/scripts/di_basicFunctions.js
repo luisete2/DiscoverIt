@@ -14,7 +14,7 @@ var iconPin = {
     anchor: new google.maps.Point(25, 50),
     scaledSize: new google.maps.Size(50, 50)
 };
-var url='http://10.34.84.90/DiscoverIt/www/php/';
+var url='http://192.168.1.41/DiscoverIt/www/php/';
 var map, routeMap, marker, mousedUp = false, service, directionsDisplay, typeQuery=0;
 var geocoder = new google.maps.Geocoder(), GeoMarker = new GeolocationMarker();
 var routesArray = [], infoWindow= new google.maps.InfoWindow();
@@ -171,6 +171,7 @@ function initRouteMap() {
             lat: 40.415347,
             lng: -3.707371
         },
+        zoom: 10,
         mapTypeId: google.maps.MapTypeId.ROADMAP,
         zoomControl: false,
         mapTypeControl: false,
@@ -271,7 +272,7 @@ function initRouteMap() {
     });
     //service = new google.maps.places.PlacesService(map);
     rDirectionsDisplay = new google.maps.DirectionsRenderer({map: routeMap});
-    if (navigator.geolocation) {
+    /*if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(function(position) {
             var pos = {
                 lat: position.coords.latitude,
@@ -284,24 +285,24 @@ function initRouteMap() {
     } else {
         // Browser doesn't support Geolocation
         handleLocationError(false, infoWindow, map.getCenter());
-    }
-    google.maps.event.addListener(routeMap, 'click', function(event) {
-      if (rOrigin === null) {
-        rOrigin = event.latLng;
-        addMarker(rOrigin);
-      } else if (rDestination === null) {
-        rDestination = event.latLng;
-        addMarker(rDestination);
-      } else {
-        if (rWaypoints.length < 9) {
-          rWaypoints.push({ location: rDestination, stopover: true });
-          rDestination = event.latLng;
-          addMarker(rDestination);
+    }*/
+    /*google.maps.event.addListener(routeMap, 'click', function(event) {
+        if (rOrigin === null) {
+            rOrigin = event.latLng;
+            addMarker(rOrigin);
+        } else if (rDestination === null) {
+            rDestination = event.latLng;
+            addMarker(rDestination);
         } else {
-          alert("Maximum number of waypoints reached");
+            if (rWaypoints.length < 9) {
+                rWaypoints.push({ location: rDestination, stopover: true });
+                rDestination = event.latLng;
+                addMarker(rDestination);
+            } else {
+                alert("Maximum number of waypoints reached");
+            }
         }
-      }
-    });
+    });*/
     /*
     map.addListener('mouseup', function(e){ 
         mousedUp = true;
@@ -323,6 +324,7 @@ function initRouteMap() {
         }, 600);
     });*/
 }
+/*
 function addMarker(latlng) {
     markers.push(new google.maps.Marker({
       position: latlng, 
@@ -338,12 +340,10 @@ function addMarker(latlng) {
       alert("Click on the map to add a start point");
       return;
     }
-    
     if (destination == null) {
       alert("Click on the map to add an end point");
       return;
     }
-    
     var mode = google.maps.DirectionsTravelMode.DRIVING;
     var request = {
         origin: origin,
@@ -408,18 +408,48 @@ function addMarker(latlng) {
     directionsDisplay = new google.maps.DirectionsRenderer();
     directionsDisplay.setMap(map);
   document.getElementById("points_textarea").value = '';
-  }
+  }*/
 
-
-
-
+$('#searchPage').on("pagecreate", function(event, ui) {
+    $(".animateCollapsible .ui-collapsible-heading-toggle").on("click", function (e) { 
+        var current = $(this).closest(".ui-collapsible");             
+        if (current.hasClass("ui-collapsible-collapsed")) {
+            //collapse all others and then expand this one
+            $(".ui-collapsible").not(".ui-collapsible-collapsed").find(".ui-collapsible-heading-toggle").click();
+            $(".ui-collapsible-content", current).slideDown(300);
+        } else {
+            $(".ui-collapsible-content", current).slideUp(300);
+        }
+    });
+});
+$('#routesPage').on("pagecreate", function(event, ui) {
+    $(".animateCollapsible .ui-collapsible-heading-toggle").on("click", function (e) { 
+        var current = $(this).closest(".ui-collapsible");             
+        if (current.hasClass("ui-collapsible-collapsed")) {
+            //collapse all others and then expand this one
+            $(".ui-collapsible").not(".ui-collapsible-collapsed").find(".ui-collapsible-heading-toggle").click();
+            $(".ui-collapsible-content", current).slideDown(300);
+        } else {
+            $(".ui-collapsible-content", current).slideUp(300);
+        }
+    });
+});
+$('#cityInfoPage').on("pagecreate", function(event, ui) {
+    $(".animateCollapsible .ui-collapsible-heading-toggle").on("click", function (e) { 
+        var current = $(this).closest(".ui-collapsible");             
+        if (current.hasClass("ui-collapsible-collapsed")) {
+            //collapse all others and then expand this one
+            $(".ui-collapsible").not(".ui-collapsible-collapsed").find(".ui-collapsible-heading-toggle").click();
+            $(".ui-collapsible-content", current).slideDown(300);
+        } else {
+            $(".ui-collapsible-content", current).slideUp(300);
+        }
+    });
+});
 
 $('#routeCreatorPage').on("pagecreate", function(event, ui) {
-    initRouteMap();
+    google.maps.event.trigger(routeMap, 'resize');
 });
-/*$('#mapPage').on("pagecreate", function(event, ui) {
-    google.maps.event.trigger(map,'resize');
-});*/
 function placeMarker(position) {
     if (markerArray[0]) {
         markerArray[0].setMap(null);
@@ -494,7 +524,7 @@ function searchPlace() {
                 }
             });
         }
-    } else {
+    } else if (typeQuery == 2){
         //INSERTAR LOADING
         var userPos = GeoMarker.getPosition();
         //CODIGO PARA BUSQUEDAS POR CERCANIA
@@ -529,6 +559,34 @@ function searchPlace() {
             document.getElementById('cleanRouteIcon').style.display = 'none';
             document.getElementById('cleanMarkersIcon').style.display = 'inline';
         });
+    } else if (typeQuery == 3){
+        if(!document.getElementById('B3City').value){
+            alert('Por favor, inserta una ciudad para realizar la busqueda.');
+        }else{
+            var city;
+            if(document.getElementById('B3City').value.indexOf(',') !== -1){
+                city = document.getElementById('B3City').value.substr(0, document.getElementById('B3City').value.indexOf(','));
+            }else if(document.getElementById('B3City').value.indexOf(' ') !== -1){
+                city = document.getElementById('B3City').value.substr(0, document.getElementById('B3City').value.indexOf(' '));
+            }else{
+                city = document.getElementById('B3City').value;
+            }
+            $.post(url+'di_placeQuerys.php', {
+                tipoQuery: typeQuery,
+                query: city,
+            }, function(data, status) {
+                var mdata = JSON.parse(data);
+                $("#cityInfoCollapsible").empty();
+                //$("#cityInfoCollapsible").collapsible();
+                for (var k in mdata){
+                    if (mdata.hasOwnProperty(k)) {
+                        $("#cityInfoCollapsible").append("<div data-role='collapsible' class='animateCollapsible' data-collapsed-icon='carat-d' data-expanded-icon='carat-u'><h3>"+k+"</h3>"+mdata[k]+"</div>");
+                    }
+                }
+                //$("#cityInfoPage .ui-header .ui-title").text(city);
+                window.location.href = '#cityInfoPage';
+            });  
+        }
     }
     setTimeout(function(){
         $.mobile.loading('hide');
@@ -614,7 +672,7 @@ function takePicture() {
         saveToPhotoAlbum: false
     });
 }
-//Sacar foto de galería
+//Sacar foto de galerí
 function importPicture(source) {
     navigator.camera.getPicture(onSuccess, onFail, {
         quality: 1,
@@ -651,11 +709,12 @@ function getRoutes(){
                 lista=lista.concat(waypoints, "<li>"+k.gRoute.destination+"</li>");
             }else lista=lista.concat("<li>"+k.gRoute.destination+"</li>");
             //hay que hacer query por cada id de monumento
-            $("#routes_accordion").append("<div class='accordion_button'>"+k.nombre+"</div><div class='accordion_content'><div class='routeMonList'><h4>Monumentos</h4><ul class='monList'>"+lista+"</ul></div><div class='routeDesc'><h4>Descripción</h4>Esta es una ruta con encanto propio que sin duda dejara a aquellos que la realicen boqueabiertos por su belleza y su misterio.</div><div class='routeFooter'><div class='button' style='width: 40%;'><i class='fa fa-star-half-o fa-lg'></i> Valorar ruta</div><br><div class='button' style='width: 40%;' onclick='setRoute(\"" + k._id.$id + "\")'>Iniciar ruta</div></div></div>");
+            $("#routesCollapsible").append("<div data-role='collapsible' class='animateCollapsible' data-collapsed-icon='carat-d' data-expanded-icon='carat-u'><h3>"+k.nombre+"</h3><div class='ui-grid-a'><div class='ui-block-a'><h4>Monumentos</h4><ul class='monList'>"+lista+"</ul></div><div class='ui-block-b'><h4>Descripción</h4>Esta es una ruta con encanto propio que sin duda dejara a aquellos que la realicen boqueabiertos por su belleza y su misterio.</div></div><div class='ui-grid-a'><div class='ui-block-a'><img id='userPhoto' src='avatar.jpg' style='border-radius: 15px; height: 30%; width: 30%;'><div id='userName'>Antonio R.</div></div><div class='ui-block-b'><button><i class='fa fa-star-half-o fa-lg'></i> Valorar ruta</button><br><button onclick='setRoute(\"" + k._id.$id + "\")'>Iniciar ruta</button></div></div>");
             routesArray[k._id.$id]=k; 
         });
     });
 }
 google.maps.event.addDomListener(window, "load", initMap);
+google.maps.event.addDomListener(window, "load", initRouteMap);
 getRoutes();
 

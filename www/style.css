@@ -4,6 +4,20 @@
 #mapa_div, #mapa_route{
     height: 100%; width: 100%; position: fixed !important;
 }
+.ui-header{
+    border-bottom: solid;
+    border-bottom-color: gray;
+    border-bottom-width: 1px;
+}
+
+.ui-footer{
+    border-top: solid;
+    border-top-color: gray;
+    border-top-width: 1px;
+}
+ul.ui-listview li{
+    padding:0;
+}
 
 /******************GLOBAL**************************/
 @-ms-viewport{
@@ -20,52 +34,6 @@ a[href^="http://maps.google.com/maps"], a[href^="https://maps.google.com/maps"]{
     background:none !important;
 }
 /*ACCORDION*/
-#search_accordion, #routes_accordion { 
-    width: 100%; 
-}
-.accordion_button {
-    cursor: pointer;
-    padding: 10px;
-    text-align: left;
-    border-style: solid;
-    border-width: 1px;
-    outline: none;
-    transition: 0.4s;
-}
-.accordion_button.active, .accordion_button:hover {
-}
-.accordion_content {
-    display: none;
-    border-style: solid;
-    border-width: 1px;
-    text-align: center;
-    padding: 5%;
-}
-
-.accordion_button:after {
-    font-size: 13px
-    float: right;
-    margin-left: 5px;
-}
-.routeMonList{
-    margin-top: 5px;
-	float : left;
-	clear : none;
-	width : 50%;
-    text-align: center;
-}
-.routeDesc{
-    margin-top: 5px;
-    float : left;
-	clear : none;
-	width : 50%;
-}
-.routeFooter{
-    margin-top: 5px;
-    clear : none;
-    width : 100%;
-    text-align: right;
-}
 ul.monList{
     width:90%; 
     height:90%;
