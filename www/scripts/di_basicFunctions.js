@@ -14,11 +14,11 @@ var iconPin = {
     anchor: new google.maps.Point(25, 50),
     scaledSize: new google.maps.Size(50, 50)
 };
-var url='http://192.168.1.41/DiscoverIt/www/php/';
+var url='http://10.34.120.97/DiscoverIt/www/php/';
 var map, routeMap, marker, mousedUp = false, service, directionsDisplay, typeQuery=0;
 var geocoder = new google.maps.Geocoder(), GeoMarker = new GeolocationMarker();
 var routesArray = [], infoWindow= new google.maps.InfoWindow();
-var autocomplete = new google.maps.places.Autocomplete(document.getElementById('B1City'),{types: ['(cities)']});
+var autocomplete =  new google.maps.places.Autocomplete(document.getElementById('B1City'),{types: ['(cities)']});
 var autocomplete2 = new google.maps.places.Autocomplete(document.getElementById('B3City'),{types: ['(cities)']});
 var rOrigin = null, rDestination = null, rWaypoints = [], markerArray = [], rDirectionsDisplay;
 
@@ -476,14 +476,14 @@ function searchPlace() {
         $.mobile.loading('show');
     },1);
     if (typeQuery === 0) {
-        alert('Por favor, selecciona un tipo de búsqueda.');
+        window.alert('Por favor, selecciona un tipo de búsqueda.');
     } else if (typeQuery == 1) {
         //INSERTAR LOADING
         //CODIGO PARA BUSQUEDAS COMPLEJAS
         if(!document.getElementById('B1Keywords').value){
-            alert('Por favor, inserta palabras clave para realizar la busqueda.');
+            window.alert('Por favor, inserta palabras clave para realizar la busqueda.');
         }else if(!document.getElementById('B1City').value){
-            alert('Por favor, inserta una ciudad para realizar la busqueda.');
+            window.alert('Por favor, inserta una ciudad para realizar la busqueda.');
         }else{
             geocoder.geocode({'address': document.getElementById('B1City').value}, function(results, status) {
                 if (status == 'OK') {
@@ -495,7 +495,7 @@ function searchPlace() {
                         query: document.getElementById('B1Keywords').value,
                         tipo: document.getElementById("B1Type").options[document.getElementById("B1Type").selectedIndex].value
                     }, function(data, status) {
-                        //alert(JSON.stringify(data, null, 4));
+                        //window.alert(JSON.stringify(data, null, 4));
                         cleanMarkers();
                         window.location.href = '#mapPage';
                         var mdata = JSON.parse(data);
@@ -520,7 +520,7 @@ function searchPlace() {
                         document.getElementById('cleanMarkersIcon').style.display = 'inline';
                     });
                 } else {
-                    alert('La geolocalización de la ciudad ha fallado. Introduce una ciudad válida. '+status);
+                    window.alert('La geolocalización de la ciudad ha fallado. Introduce una ciudad válida. '+status);
                 }
             });
         }
@@ -561,7 +561,7 @@ function searchPlace() {
         });
     } else if (typeQuery == 3){
         if(!document.getElementById('B3City').value){
-            alert('Por favor, inserta una ciudad para realizar la busqueda.');
+            window.alert('Por favor, inserta una ciudad para realizar la busqueda.');
         }else{
             var city;
             if(document.getElementById('B3City').value.indexOf(',') !== -1){
@@ -576,21 +576,27 @@ function searchPlace() {
                 query: city,
             }, function(data, status) {
                 var mdata = JSON.parse(data);
-                $("#cityInfoCollapsible").empty();
-                //$("#cityInfoCollapsible").collapsible();
-                for (var k in mdata){
-                    if (mdata.hasOwnProperty(k)) {
-                        $("#cityInfoCollapsible").append("<div data-role='collapsible' class='animateCollapsible' data-collapsed-icon='carat-d' data-expanded-icon='carat-u'><h3>"+k+"</h3>"+mdata[k]+"</div>");
+                if(mdata!=="Vacia"){
+                    $("#cityInfoCollapsible").empty();
+                    //$("#cityInfoCollapsible").collapsible();
+                    for (var k in mdata){
+                        if (mdata.hasOwnProperty(k)) {
+                            $("#cityInfoCollapsible").append("<div data-role='collapsible' class='animateCollapsible' data-collapsed-icon='carat-d' data-expanded-icon='carat-u'><h3>"+k+"</h3>"+mdata[k]+"</div>").trigger('create');
+                        }
                     }
-                }
-                //$("#cityInfoPage .ui-header .ui-title").text(city);
-                window.location.href = '#cityInfoPage';
+                    window.location.href = '#cityInfoPage';
+                    //city=city.charAt(0).toUpperCase() + string.city(1)
+                    $('#cityInfoPage').children('div').children('h1').text(capitalizeFirstLetter(city));
+                }else window.alert('¡No se han encontrado resultados!');
             });  
         }
     }
     setTimeout(function(){
         $.mobile.loading('hide');
     },300);  
+}
+function capitalizeFirstLetter(string) {
+    return string.charAt(0).toUpperCase() + string.slice(1);
 }
 /*Metodo para sacar lugares de interes en busqueda cercana. hay que implementar
     alert('sumergise hijo de puta');
@@ -600,9 +606,9 @@ function searchPlace() {
             //keyword: "POI",
             types: document.getElementById("B2Type").options[document.getElementById("B2Type").selectedIndex].value
         }, function (results, status) {
-            alert(status);
+            window.alert(status);
             if (status === google.maps.places.PlacesServiceStatus.OK) {
-                alert('hemos hecho busqueda');
+                window.alert('hemos hecho busqueda');
                 cleanMarkers();
                 window.location.href = '#mapPage';
                 map.panTo(GeoMarker.getPosition());
@@ -623,7 +629,7 @@ function searchPlace() {
                 document.getElementById('cleanRouteIcon').style.display = 'none';
                 document.getElementById('cleanMarkersIcon').style.display = 'inline';
             } else {
-                alert(status);
+                window.alert(status);
             }
         });
 */

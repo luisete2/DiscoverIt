@@ -82,5 +82,13 @@
         },
         "is_top_level": true,
         "variables": {}
+    },
+    "cordova-plugin-whitelist": {
+        "source": {
+            "type": "local",
+            "path": "C:\\Users\\usuario\\AppData\\Local\\Intel\\XDK\\xdk\\components\\server\\cordova\\cordova-plugins\\cordova-plugin-whitelist"
+        },
+        "is_top_level": true,
+        "variables": {}
     }
 }

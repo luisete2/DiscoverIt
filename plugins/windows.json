@@ -33,10 +33,16 @@
         },
         "com-badrit-base64": {
             "PACKAGE_NAME": "HelloCordova"
+        },
+        "cordova-plugin-whitelist": {
+            "PACKAGE_NAME": "HelloCordova"
         }
     },
     "dependent_plugins": {
         "cordova-plugin-compat": {
+            "PACKAGE_NAME": "HelloCordova"
+        },
+        "cordova-plugin-device": {
             "PACKAGE_NAME": "HelloCordova"
         }
     }

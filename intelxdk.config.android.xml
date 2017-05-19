@@ -59,4 +59,4 @@
     <preference name="SplashMaintainAspectRatio" value="false"/>
 </platform>
 <intelxdk:crosswalk xmlns:intelxdk="http://xdk.intel.com/ns/v1" xwalk-command-line="--disable-pull-to-refresh-effect"/>
-<intelxdk:crosswalk xmlns:intelxdk="http://xdk.intel.com/ns/v1" xwalk-command-line="--ignore-gpu-blacklist"/></widget>
+<intelxdk:crosswalk xmlns:intelxdk="http://xdk.intel.com/ns/v1" xwalk-command-line="--ignore-gpu-blacklist"/></widget><allow-navigation href="*" />
