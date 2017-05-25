@@ -8,10 +8,12 @@
         <link href="lib/appframework/af.ui.css" rel="stylesheet" type="text/css"/>
         <link rel="stylesheet" type="text/css" href="css/jquery.mobile.flatui.css" />
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+        <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.3/themes/smoothness/jquery-ui.css" />
+        <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.3/jquery-ui.min.js"></script>
+        <script src="http://spin.js.org/spin.js" type="text/javascript"></script>
+        <script src="http://spin.js.org/jquery.spin.js" type="text/javascript"></script>
         <script src="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
         <script src="https://use.fontawesome.com/9aa9f12b68.js"></script>
-        <script src="lib/spin.js" type="text/javascript"></script>
-        <script src="http://spin.js.org/jquery.spin.js" type="text/javascript"></script>
         <script charset="utf-8" src="lib/fastclick.min.js" type="text/javascript"></script>
         <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?libraries=places&key=AIzaSyCUTg59OdxJKdSgeIo5qiUDUZM2AyNK8RQ"></script>
         <script charset="utf-8" src="lib/geolocation-marker.js" type="text/javascript"></script>
@@ -22,37 +24,38 @@
         <div data-role="page" id="mapPage" data-theme="d">
             <div data-role="content" style="padding:0">
                 <div id="mapa_div"></div>
-                <a href="#searchPage"><i class="fa fa-search fa-3x" aria-hidden="true" style="position: absolute; top: 2%; right: 3%;" id="searchIcon"></i></a>
-                <a href="#userPage"><i class="fa fa-user fa-3x" aria-hidden="true" style="position: absolute; bottom: 2%; right: 3%;" id="userIcon"></i></a>
+                <a href="#searchPage" onclick='$( "#mainNav" ).hide();'><i class="fa fa-search fa-3x" aria-hidden="true" style="position: absolute; top: 2%; right: 3%;" id="searchIcon"></i></a>
+                <a href="#userPage" onclick='$( "#mainNav" ).hide();'><i class="fa fa-user fa-3x" aria-hidden="true" style="position: absolute; bottom: 2%; right: 3%;" id="userIcon"></i></a>
                 <i class="fa fa-location-arrow fa-3x" aria-hidden="true" style="position: absolute; bottom: 2%; left: 3%;" id="locationIcon"></i>
-                <span class="fa-stack fa-lg" style="position: absolute; bottom: 12%; left: 3%; display:none;" id="cleanMarkersIcon">
+                <span class="fa-stack fa-lg" style="position: absolute; bottom: 12%; left: 3%; display:none;" id="cleanMarkersIcon" onclick="cleanMap();">
                     <i class="fa fa-map-marker fa-stack-2x"></i>
                     <i class="fa fa-times fa-stack-2x" style="color:red;"></i>
                 </span>
-                <span class="fa-stack fa-lg" style="position: absolute; bottom: 12%; left: 3%; display:none;" id="cleanRouteIcon">
+                <span class="fa-stack fa-lg" style="position: absolute; bottom: 12%; left: 3%; display:none;" id="cleanRouteIcon" onclick="directionsDisplay.setDirections({routes: []}); document.getElementById('cleanRouteIcon').style.display = 'none';">
                     <i class="fa fa-map-signs fa-stack-2x"></i>
                     <i class="fa fa-times fa-stack-2x" style="color:red;"></i>
                 </span>
             </div>
-</div>
+        </div>
         <div data-role="page" id="searchPage" data-theme="d">
             <div data-role="header" data-position="fixed" data-tap-toggle="false">
-                <a onclick="backDisplayFooter()" data-icon="carat-l">Volver</a>
+                <a data-rel="back" onclick='$( "#mainNav" ).show();' data-icon="carat-l">Volver</a>
                 <h1>Búsqueda</h1>
             </div>
             <div data-role="content">
                 <div class="ui-collapsible-set" style="margin-left: -1em; margin-right: -1em; margin-top: -0.5em">
                     <div data-role="collapsible" class="animateCollapsible" data-collapsed-icon="carat-d" data-expanded-icon="carat-u">
                         <h3 onclick="typeQuery=1">Búsqueda simple</h3>
-                        <p>Palabras clave</p>
-                        <input type="text" id="B1Keywords"><br>
                         <p>Ciudad</p>
                         <input type="text" id="B1City"><br>
                         <p>Tipo</p>
-                        <select id="B1Type">
+                        <select id="B1Query">
                             <option selected="selected" value="">Ningún tipo seleccionado</option>
-                            <option value="museum">Museo</option>
-                            <option value="art_gallery">Galería de arte</option>
+                            <option value="museo">Museo</option>
+                            <option value="monumento">Monumentos</option>
+                            <option value="interes">Sitios de interés</option>
+                            <option value="ocio">Ocio</option>
+                            <!--<option value="art_gallery">Galería de arte</option>
                             <option value="bar">Bar</option>
                             <option value="cafe">Cafetería</option>
                             <option value="amusement_park">Parque de atracciones</option>
@@ -72,7 +75,7 @@
                             <option value="park">Parque</option>
                             <option value="restaurant">Restaurante</option>
                             <option value="stadium">Estadio deportivo</option>
-                            <option value="university">Universidad</option>
+                            <option value="university">Universidad</option>-->
                         </select><br>
                     </div>
                     <div data-role="collapsible" class="animateCollapsible" data-collapsed-icon="carat-d" data-expanded-icon="carat-u">
@@ -80,30 +83,12 @@
                         <p>Introduce un rango de cercanía (metros)</p>
                         <input type="range" id="B2In" value="500" min="100" max="3000" data-highlight="true"><br>
                         <p>Tipo</p>
-                        <select id="B2Type">
+                        <select id="B2Query">
                             <option selected="selected" value="">Ningún tipo seleccionado</option>
-                            <option value="museum">Museo</option>
-                            <option value="art_gallery">Galería de arte</option>
-                            <option value="bar">Bar</option>
-                            <option value="cafe">Cafetería</option>
-                            <option value="amusement_park">Parque de atracciones</option>
-                            <option value="aquarium">Acuario</option>
-                            <option value="zoo">Zoológico</option>
-                            <option value="casino">Casino</option>
-                            <option value="cemetery">Cementerio</option>
-                            <option value="city_hall">Ayuntamiento</option>
-                            <option value="embassy">Embajada</option>
-                            <option value="church">Iglesia</option>
-                            <option value="hindu_temple">Templo hindú</option>
-                            <option value="synagogue">Sinagoga</option>
-                            <option value="mosque">Mezquita</option>
-                            <option value="library">Biblioteca</option>
-                            <option value="movie_theater">Cine</option>
-                            <option value="night_club">Discoteca</option>
-                            <option value="park">Parque</option>
-                            <option value="restaurant">Restaurante</option>
-                            <option value="stadium">Estadio deportivo</option>
-                            <option value="university">Universidad</option>
+                            <option value="museo">Museo</option>
+                            <option value="monumento">Monumentos</option>
+                            <option value="interes">Sitios de interés general</option>
+                            <option value="ocio">Ocio</option>
                         </select><br>
                     </div>
                     <div data-role="collapsible" class="animateCollapsible" data-collapsed-icon="carat-d" data-expanded-icon="carat-u">
@@ -126,7 +111,7 @@
         </div>
         <div data-role="page" id="userPage" data-theme="d">
             <div data-role="header" data-position="fixed" data-tap-toggle="false">
-                <a onclick="backDisplayFooter()" data-icon="carat-l">Volver</a>
+                <a data-rel="back" onclick='$("#mainNav").show();' data-icon="carat-l">Volver</a>
                 <h1>Usuario</h1>
             </div>
             <div data-role="content">
@@ -149,12 +134,25 @@
                 <button data-role="button">Modificar datos</button>
                 <button data-role="button">Borrar cuenta</button>
                 <button data-role="button">Rutas favoritas</button>
-                <a data-role="button" href="#routeCreatorPage">Crear ruta</a>
+                <a data-role="button" href="#routeCreatorPage" onclick='$("#routeCreatorNav").show();'>Crear ruta</a>
                 <button data-role="button">Mis rutas</button>
             </div>
         </div>
         <div data-role="page" id="routesPage" data-theme="d">
-            <div data-role="header" data-position="fixed" data-tap-toggle="false"></div> 
+            <div data-role="header" data-position="fixed" data-tap-toggle="false"><ul>
+                    <li><a data-ajax="false">
+                        Populares
+                    </a></li>
+                    <li><a  data-ajax="false">
+                        Cercanas
+                    </a></li>
+                    <li><a data-ajax="false">
+                        Buscar
+                    </a></li>
+                    <li><a data-ajax="false">
+                        Descargadas
+                    </a></li>
+                </ul></div> 
             <div data-role="content" style="padding:0">
                 <div class="ui-collapsible-set" id="routesCollapsible"></div>
             </div>
@@ -167,16 +165,39 @@
         </div>
         <div data-role="page" id="routeCreatorPage" data-theme="d">
             <div data-role="header" data-position="fixed" data-tap-toggle="false">
-                <a data-rel="back" data-icon="carat-l">Volver</a>
+                <a data-rel="back" data-icon="carat-l" onclick='$("#routeCreatorNav").hide(); resetRoute();'>Volver</a>
                 <h1>Creador de rutas</h1>
             </div>
             <div data-role="content" style="padding:0">
                 <div id="mapa_route"></div>
+                <i class="fa fa-search fa-3x" aria-hidden="true" style="position: absolute; top: 12%; right: 3%;"></i>
             </div>
-            <div data-role="footer" data-position="fixed" data-tap-toggle="false">
+            <div data-role="footer" data-position="fixed" data-tap-toggle="false" id="routeCreatorNav">
                 <div data-role="navbar">
-                    aqui van las opciones del creador
+                    <ul>
+                        <li><a onclick="resetRoute()"><i aria-hidden="true" class="fa fa-trash-o fa-2x"></i>
+                        </a></li>
+                        <li><a onclick="undoMarker()"><i aria-hidden="true" class="fa fa-undo fa-2x" ></i>
+                        </a></li>
+                        <li><a onclick="calcRoute()"><i aria-hidden="true" class="fa fa-eye fa-2x"></i>
+                        </a></li>
+                        <li><a id="confirmRoute" href="#routeCreator2Page" onclick='$("#routeCreatorNav").hide();'><i aria-hidden="true" class="fa fa-check fa-2x"></i>
+                        </a></li>
+                    </ul>
                 </div>
+            </div>
+        </div>
+        <div data-role="page" id="routeCreator2Page" data-theme="d">
+            <div data-role="header" data-position="fixed" data-tap-toggle="false">
+                <a data-rel="back" data-icon="carat-l" onclick='$("#routeCreatorNav").show();'>Volver</a>
+                <h1>Creador de rutas</h1>
+            </div>
+            <div data-role="content">
+                <p>Nombre de la ruta</p>
+                <input type="text" id="routeName"><br>
+                <p>Descripción de la ruta</p>
+                <textarea id="routeDesc"></textarea><br>
+                <button onclick="saveRoute()"><i class="fa fa-floppy-o fa-lg"></i> Guardar ruta</button>
             </div>
         </div>
         <div data-role="footer" data-position="fixed" data-tap-toggle="false" id="mainNav">
