@@ -9,12 +9,15 @@ function onDeviceReady() {
     window.StatusBar.overlaysWebView(false);
     //google.maps.event.addDomListener(window, 'load', initMap);
 }
+$.fn.spin.presets.loading = {
+    lines: 15, length: 41, width: 14, radius: 42, scale: 0.75, corners: 1, color: '#000', opacity: 0.25, rotate: 0, direction: 1, speed: 1, trail: 60, fps: 20, zIndex: 2e9, className: 'spinner', top: '50%', left: '50%', shadow: true, hwaccel: false, position: 'absolute'
+};
 var iconPin = {
     url: "location_marker.svg",
     anchor: new google.maps.Point(25, 50),
     scaledSize: new google.maps.Size(50, 50)
 };
-var url='http://10.34.120.97/DiscoverIt/www/php/';
+var url='http://10.34.81.129/DiscoverIt/www/php/';
 var map, routeMap, marker, mousedUp = false, service, directionsDisplay, typeQuery=0;
 var geocoder = new google.maps.Geocoder(), GeoMarker = new GeolocationMarker();
 var routesArray = [], infoWindow= new google.maps.InfoWindow();
@@ -146,7 +149,7 @@ function initMap() {
                 map.fitBounds(this.getBounds());
             });
             google.maps.event.addListener(GeoMarker, 'geolocation_error', function(e) {
-                alert('There was an error obtaining your position. Message: ' + e.message);
+                window.alert('There was an error obtaining your position. Message: ' + e.message);
             });
             GeoMarker.setMap(map);
         }, function() {
@@ -409,8 +412,13 @@ function addMarker(latlng) {
     directionsDisplay.setMap(map);
   document.getElementById("points_textarea").value = '';
   }*/
-
-$('#searchPage').on("pagecreate", function(event, ui) {
+$(document).on("pagecontainerbeforehide", function () {
+    $('#mainNav ul').addClass('ui-state-disabled');
+});
+$(document).on("pagecontainershow", function () {
+   $('#mainNav ul').removeClass('ui-state-disabled');
+});
+$('#searchPage, #routesPage, #cityInfoPage').on("pagecreate", function(event, ui) {
     $(".animateCollapsible .ui-collapsible-heading-toggle").on("click", function (e) { 
         var current = $(this).closest(".ui-collapsible");             
         if (current.hasClass("ui-collapsible-collapsed")) {
@@ -422,31 +430,13 @@ $('#searchPage').on("pagecreate", function(event, ui) {
         }
     });
 });
-$('#routesPage').on("pagecreate", function(event, ui) {
-    $(".animateCollapsible .ui-collapsible-heading-toggle").on("click", function (e) { 
-        var current = $(this).closest(".ui-collapsible");             
-        if (current.hasClass("ui-collapsible-collapsed")) {
-            //collapse all others and then expand this one
-            $(".ui-collapsible").not(".ui-collapsible-collapsed").find(".ui-collapsible-heading-toggle").click();
-            $(".ui-collapsible-content", current).slideDown(300);
-        } else {
-            $(".ui-collapsible-content", current).slideUp(300);
-        }
-    });
+$('#userPage, #searchPage').on("pagecreate", function(event, ui) {
+    $( "#mainNav" ).hide();
 });
-$('#cityInfoPage').on("pagecreate", function(event, ui) {
-    $(".animateCollapsible .ui-collapsible-heading-toggle").on("click", function (e) { 
-        var current = $(this).closest(".ui-collapsible");             
-        if (current.hasClass("ui-collapsible-collapsed")) {
-            //collapse all others and then expand this one
-            $(".ui-collapsible").not(".ui-collapsible-collapsed").find(".ui-collapsible-heading-toggle").click();
-            $(".ui-collapsible-content", current).slideDown(300);
-        } else {
-            $(".ui-collapsible-content", current).slideUp(300);
-        }
-    });
-});
-
+function backDisplayFooter(){
+    $( "#mainNav" ).show();
+    window.history.back();
+}
 $('#routeCreatorPage').on("pagecreate", function(event, ui) {
     google.maps.event.trigger(routeMap, 'resize');
 });
@@ -470,15 +460,11 @@ function cleanMarkers() {
     markerArray.length = 0;
     document.getElementById('cleanMarkersIcon').style.display = 'none';
 }
-
 function searchPlace() {
-    setTimeout(function(){
-        $.mobile.loading('show');
-    },1);
+    $('#searchPage').spin('loading');
     if (typeQuery === 0) {
         window.alert('Por favor, selecciona un tipo de búsqueda.');
     } else if (typeQuery == 1) {
-        //INSERTAR LOADING
         //CODIGO PARA BUSQUEDAS COMPLEJAS
         if(!document.getElementById('B1Keywords').value){
             window.alert('Por favor, inserta palabras clave para realizar la busqueda.');
@@ -497,7 +483,7 @@ function searchPlace() {
                     }, function(data, status) {
                         //window.alert(JSON.stringify(data, null, 4));
                         cleanMarkers();
-                        window.location.href = '#mapPage';
+                        $.mobile.changePage("#mapPage");
                         var mdata = JSON.parse(data);
                         mdata.forEach(function(k) {
                             var marker = new google.maps.Marker({
@@ -518,14 +504,15 @@ function searchPlace() {
                         directionsDisplay.setDirections({routes: []});
                         document.getElementById('cleanRouteIcon').style.display = 'none';
                         document.getElementById('cleanMarkersIcon').style.display = 'inline';
+                        $('#searchPage').spin(false);
                     });
                 } else {
                     window.alert('La geolocalización de la ciudad ha fallado. Introduce una ciudad válida. '+status);
+                    $('#searchPage').spin(false);
                 }
             });
         }
     } else if (typeQuery == 2){
-        //INSERTAR LOADING
         var userPos = GeoMarker.getPosition();
         //CODIGO PARA BUSQUEDAS POR CERCANIA
         $.post(url+'di_placeQuerys.php', {
@@ -536,7 +523,8 @@ function searchPlace() {
             tipo: document.getElementById("B2Type").options[document.getElementById("B2Type").selectedIndex].value
         }, function(data, status) {
             cleanMarkers();
-            window.location.href = '#mapPage';
+            $.mobile.changePage( "#mapPage");
+            $( "#mainNav" ).show();
             map.panTo(GeoMarker.getPosition());
             var mdata = JSON.parse(data);
             mdata.forEach(function(k) {
@@ -558,6 +546,7 @@ function searchPlace() {
             directionsDisplay.setDirections({routes: []});
             document.getElementById('cleanRouteIcon').style.display = 'none';
             document.getElementById('cleanMarkersIcon').style.display = 'inline';
+            $('#searchPage').spin(false);
         });
     } else if (typeQuery == 3){
         if(!document.getElementById('B3City').value){
@@ -575,25 +564,26 @@ function searchPlace() {
                 tipoQuery: typeQuery,
                 query: city,
             }, function(data, status) {
+                console.log(data);
                 var mdata = JSON.parse(data);
+                
                 if(mdata!=="Vacia"){
                     $("#cityInfoCollapsible").empty();
-                    //$("#cityInfoCollapsible").collapsible();
                     for (var k in mdata){
                         if (mdata.hasOwnProperty(k)) {
                             $("#cityInfoCollapsible").append("<div data-role='collapsible' class='animateCollapsible' data-collapsed-icon='carat-d' data-expanded-icon='carat-u'><h3>"+k+"</h3>"+mdata[k]+"</div>").trigger('create');
                         }
                     }
-                    window.location.href = '#cityInfoPage';
-                    //city=city.charAt(0).toUpperCase() + string.city(1)
+                    $.mobile.changePage( "#cityInfoPage");
+                    $( "#mainNav" ).show();
                     $('#cityInfoPage').children('div').children('h1').text(capitalizeFirstLetter(city));
-                }else window.alert('¡No se han encontrado resultados!');
+                }else{
+                    window.alert('¡No se han encontrado resultados!');
+                } 
+                $('#searchPage').spin(false);
             });  
         }
     }
-    setTimeout(function(){
-        $.mobile.loading('hide');
-    },300);  
 }
 function capitalizeFirstLetter(string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
@@ -610,7 +600,7 @@ function capitalizeFirstLetter(string) {
             if (status === google.maps.places.PlacesServiceStatus.OK) {
                 window.alert('hemos hecho busqueda');
                 cleanMarkers();
-                window.location.href = '#mapPage';
+                $.mobile.changePage( "#mapPage");
                 map.panTo(GeoMarker.getPosition());
                 results.forEach(function(k) {
                     var marker = new google.maps.Marker({
@@ -688,6 +678,7 @@ function importPicture(source) {
 }
 //SECCION RUTAS
 function setRoute(routeId){
+    $('#routesPage').spin('loading');
     if(markerArray.length!==0) cleanMarkers();
     var directionsService = new google.maps.DirectionsService();
     directionsService.route(routesArray[routeId].gRoute, function(response, status) {
@@ -700,6 +691,7 @@ function setRoute(routeId){
         });       
     });
     document.getElementById('cleanRouteIcon').style.display = 'inline';
+    $('#routesPage').spin(false);
 }
 function getRoutes(){
     //alert('entramos');

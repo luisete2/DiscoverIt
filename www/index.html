@@ -10,6 +10,8 @@
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
         <script src="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
         <script src="https://use.fontawesome.com/9aa9f12b68.js"></script>
+        <script src="lib/spin.js" type="text/javascript"></script>
+        <script src="http://spin.js.org/jquery.spin.js" type="text/javascript"></script>
         <script charset="utf-8" src="lib/fastclick.min.js" type="text/javascript"></script>
         <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?libraries=places&key=AIzaSyCUTg59OdxJKdSgeIo5qiUDUZM2AyNK8RQ"></script>
         <script charset="utf-8" src="lib/geolocation-marker.js" type="text/javascript"></script>
@@ -35,7 +37,7 @@
 </div>
         <div data-role="page" id="searchPage" data-theme="d">
             <div data-role="header" data-position="fixed" data-tap-toggle="false">
-                <a data-rel="back" data-icon="carat-l">Volver</a>
+                <a onclick="backDisplayFooter()" data-icon="carat-l">Volver</a>
                 <h1>Búsqueda</h1>
             </div>
             <div data-role="content">
@@ -124,7 +126,7 @@
         </div>
         <div data-role="page" id="userPage" data-theme="d">
             <div data-role="header" data-position="fixed" data-tap-toggle="false">
-                <a data-rel="back" data-icon="carat-l">Volver</a>
+                <a onclick="backDisplayFooter()" data-icon="carat-l">Volver</a>
                 <h1>Usuario</h1>
             </div>
             <div data-role="content">
@@ -152,9 +154,7 @@
             </div>
         </div>
         <div data-role="page" id="routesPage" data-theme="d">
-            <div data-role="header" data-position="fixed" data-tap-toggle="false">
-                <h1>Rutas</h1>
-            </div> 
+            <div data-role="header" data-position="fixed" data-tap-toggle="false"></div> 
             <div data-role="content" style="padding:0">
                 <div class="ui-collapsible-set" id="routesCollapsible"></div>
             </div>
@@ -179,7 +179,7 @@
                 </div>
             </div>
         </div>
-        <div data-role="footer" data-position="fixed" data-tap-toggle="false">
+        <div data-role="footer" data-position="fixed" data-tap-toggle="false" id="mainNav">
             <div data-role="navbar">
                 <ul>
                     <li><a href="#mapPage" data-ajax="false">
