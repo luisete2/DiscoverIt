@@ -1,5 +1,4 @@
 /* jshint browser: true */
-
 //PRIMERA INICIALIZACION
 document.addEventListener("deviceready", onDeviceReady, false);
 function onDeviceReady() {
@@ -22,7 +21,8 @@ var iconPin = {
     anchor: new google.maps.Point(25, 50),
     scaledSize: new google.maps.Size(50, 50)
 };
-var url='http://10.34.81.129/DiscoverIt/www/php/';
+
+var url='http://192.168.1.133/DiscoverIt/www/php/';
 google.maps.event.addDomListener(window, "load", initMap);
 google.maps.event.addDomListener(window, "load", initRouteMap);
 getRoutes();
@@ -31,7 +31,8 @@ var geocoder = new google.maps.Geocoder(), GeoMarker = new GeolocationMarker();
 var routesArray = [], infoWindow= new google.maps.InfoWindow();
 var rDirectionsService = new google.maps.DirectionsService();
 var autocomplete =  new google.maps.places.Autocomplete(document.getElementById('B1City'),{types: ['(cities)']});
-var rOrigin = null, rDestination = null, rWaypoints = [], markerArray = [], rDirectionsDisplay, rMarkerArray=[];
+var autocompleteRC =  new google.maps.places.Autocomplete(document.getElementById('RCCity'),{types: ['(cities)']});
+var rOrigin = null, rDestination = null, rWaypoints = [], markerArray = [], rDirectionsDisplay, rMarkerArray=[], bMarkerArray=[], rMarkerInfo=[];
 
 //SECCIÓN MAPA
 //Mapa de pagina principal
@@ -46,6 +47,7 @@ function initMap() {
         mapTypeId: google.maps.MapTypeId.ROADMAP,
         zoomControl: false,
         mapTypeControl: false,
+        minZoom: 5, maxZoom: 18,
         scaleControl: false,
         streetViewControl: true,
         streetViewControlOptions: {
@@ -183,6 +185,7 @@ function initRouteMap() {
         mapTypeId: google.maps.MapTypeId.ROADMAP,
         zoomControl: false,
         mapTypeControl: false,
+        minZoom: 5, maxZoom: 18,
         scaleControl: false,
         streetViewControl: false,
         streetViewControlOptions: {
@@ -300,6 +303,9 @@ function initRouteMap() {
     routeMap.addListener('dragstart', function(e){ 
         mousedUp = true;
     });
+    routeMap.addListener('dragend', function(e){ 
+        mousedUp = true;
+    });
     routeMap.addListener('zoom_changed', function(e){ 
         mousedUp = true;
     });
@@ -307,32 +313,50 @@ function initRouteMap() {
         mousedUp = false;
         setTimeout(function(){
             if(mousedUp === false){
-                if (rOrigin === null) {
-                    rOrigin = e.latLng;
-                    addMarker(rOrigin);
-                } else if (rDestination === null) {
-                    rDestination = e.latLng;
-                    addMarker(rDestination);
-                } else {
-                    if (rWaypoints.length < 9) {
-                        rWaypoints.push({ location: rDestination, stopover: true });
-                        rDestination = e.latLng;
-                        addMarker(rDestination);
-                    } else {
-                        window.alert("¡Has alcanzado el tamaño máximo de ruta! Por favor, elimina algún punto para añadir otro.");
-                    }
-                }
+                e.position=e.latLng;
+                addMarker(e);
             }
         }, 400);
     });
+    google.maps.event.addListener(autocompleteRC, 'place_changed', function(){
+        var place = autocompleteRC.getPlace();
+    });
 }
-
-function addMarker(latlng) {
-    rMarkerArray.push(new google.maps.Marker({
-        position: latlng, 
-        map: routeMap,
-        //draggable: true,
-    }));    
+function addMarker(marker) {
+    if (rOrigin === null) {
+        rOrigin = marker.position;
+        placeMarker(marker);
+    } else if (rDestination === null) {
+        rDestination = marker.position;
+        placeMarker(marker);
+    } else {
+        if (rWaypoints.length < 9) {
+            rWaypoints.push({ location: rDestination, stopover: true });
+            rDestination = marker.position;
+            placeMarker(marker);
+        } else {
+            window.alert("¡Has alcanzado el tamaño máximo de ruta! Por favor, elimina algún punto para añadir otro.");
+        }
+    }   
+}
+function placeMarker(marker){
+    if(marker.hasOwnProperty('extraInfo')){
+        rMarkerArray.push(new google.maps.Marker({
+            position: marker.position, 
+            map: routeMap,
+            icon: 'http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld='+(rMarkerArray.length+1)+'|58ACFA|000000',
+            extraInfo: marker.extraInfo,
+            pos: marker.pos
+            //draggable: true,
+        }));  
+    }else{
+        rMarkerArray.push(new google.maps.Marker({
+            position: marker.position, 
+            map: routeMap,
+            icon: 'http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld='+(rMarkerArray.length+1)+'|58ACFA|000000'  
+            //draggable: true,
+        }));  
+    }
 }
 function undoMarker() {
     if(rMarkerArray.length==0){
@@ -346,11 +370,15 @@ function undoMarker() {
             rDestination=rMarkerArray[rMarkerArray.length-2].position;
         }
         rMarkerArray[rMarkerArray.length-1].setMap(null);
+        if(rMarkerArray[rMarkerArray.length-1].hasOwnProperty('extraInfo') && bMarkerArray.length !== 0){
+            bMarkerArray[rMarkerArray[rMarkerArray.length-1].pos].setMap(routeMap);
+        }
         rMarkerArray.pop();
         rWaypoints.pop();
     }
 }
 function calcRoute() {
+    cleanRouteMap();
     if (rOrigin == null) {
         window.alert("¡No puedes crear una ruta sin un punto de inicio!");
         return;
@@ -405,14 +433,29 @@ function saveRoute(){
         window.alert('Introduce un nombre a tu ruta para guardarla.');
         $('#searchPage').spin(false);
     }else{
+        var infoPlaces=[];
+        rMarkerArray.forEach(function(element){
+            var place = new Object();
+            if(element.hasOwnProperty('extraInfo')){
+                place.nombre=element.extraInfo.nombre;
+                place.descripcion=element.extraInfo.descripcion;
+                place.direccion=element.extraInfo.localizacion.direccion;
+                infoPlaces.push(place);
+            }else{
+                place.nombre=element.position.toString();
+                infoPlaces.push(place);
+            }
+        });
         $.post(url+'di_saveRoute.php', {
             ruta: JSON.stringify(request),
             nombre: document.getElementById('routeName').value,
             descripcion: document.getElementById('routeDesc').value,
+            arrayInfo: JSON.stringify(infoPlaces),
         }, function(data, status) {
             if(data=='SUCCESS'){
                 window.alert('¡Ruta guardada con éxito!');
                 $.mobile.changePage("#mapPage");
+                $("#mainNav").show();
                 resetRoute();
             }else{
                 window.alert('Algo falló O.o');
@@ -421,24 +464,97 @@ function saveRoute(){
         });
     }
 }
-
-function placeMarker(position) {
-    if (markerArray[0]) {
-        markerArray[0].setMap(null);
-        markerArray.length = 0;
-    }
-    markerArray[0] = new google.maps.Marker({
-        position: position,
-        map: map,
-        draggable: true,
-        animation: google.maps.Animation.DROP,
-        raiseOnDrag: true
-    });
-}
 function cleanMap() {
     clearMarkers(markerArray);
     markerArray = [];
     document.getElementById('cleanMarkersIcon').style.display = 'none';
+}
+function cleanRouteMap() {
+    clearMarkers(bMarkerArray);
+    bMarkerArray = [];
+    document.getElementById('cleanRCMarkersIcon').style.display = 'none';
+}
+function searchRCPlace() {
+    $('#searchRCPage').spin('loading');
+    if(!document.getElementById('RCCity').value){
+        window.alert('Por favor, inserta una ciudad para realizar la búsqueda.');
+        $('#searchRCPage').spin(false);
+    }else{
+        geocoder.geocode({'address': document.getElementById('RCCity').value}, function(results, status) {
+            if (status == 'OK') {
+                var city;
+                if(document.getElementById('RCCity').value.indexOf(',') !== -1){
+                    city = document.getElementById('RCCity').value.substr(0, document.getElementById('RCCity').value.indexOf(',')); 
+                }else if(document.getElementById('RCCity').value.indexOf(' ') !== -1){
+                    city = document.getElementById('RCCity').value.substr(0, document.getElementById('RCCity').value.indexOf(' ')); 
+                }else{
+                    city = document.getElementById('RCCity').value;
+                }
+                alert(city);
+                $.post(url+'di_placeQuerys.php', {
+                    tipoQuery: 4,
+                    city: city,
+                    tipo: document.getElementById("RCType").value
+                }, function(data, status) {
+                    //window.alert(JSON.stringify(data, null, 4));
+                    var mdata = JSON.parse(data);
+                    if(mdata!=="Vacia"){
+                        var contador=0;
+                        cleanRouteMap();
+                        mdata.forEach(function(k) {
+                            var marker = new google.maps.Marker({
+                                position: {
+                                    lat: k.localizacion.punto.latitud,
+                                    lng: k.localizacion.punto.longitud
+                                },
+                                //icon: iconPin,
+                                map: routeMap,
+                                pos: contador,
+                                extraInfo: k
+                                //animation: google.maps.Animation.DROP
+                            });
+                            marker.addListener('click', function() {
+                                infoWindow.setContent('<div id="content"><div id="siteNotice"></div><h2>' + k.nombre + '</h2><div id="bodyContent"><p>' + k.localizacion.direccion + '</p></div></div>');
+                                infoWindow.open(routeMap, this);
+                            });
+                            marker.addListener('mouseup', function(e){ 
+                                mousedUp = true;
+                            });
+                            marker.addListener('dragstart', function(e){ 
+                                mousedUp = true;
+                            });
+                            marker.addListener('dragend', function(e){ 
+                                mousedUp = true;
+                            });
+                            marker.addListener('zoom_changed', function(e){ 
+                                mousedUp = true;
+                            });
+                            marker.addListener('mousedown', function(e) {
+                                mousedUp = false;
+                                setTimeout(function(){
+                                    addMarker(marker);
+                                    marker.setMap(null);
+                                }, 400);
+                            });                           
+                            bMarkerArray.push(marker);
+                            contador++;
+                        });
+                        routeMap.panTo(results[0].geometry.location);
+                        rDirectionsDisplay.setDirections({routes: []});
+                        document.getElementById('cleanRCMarkersIcon').style.display = 'inline';
+                        $.mobile.changePage("#routeCreatorPage");
+                        $("#routeCreatorNav").show();
+                    }else{
+                        window.alert('¡No se han encontrado resultados!');
+                    } 
+                    $('#searchRCPage').spin(false);
+                });
+            } else {
+                window.alert('La geolocalización de la ciudad ha fallado. Introduce una ciudad válida. ');
+                $('#searchRCPage').spin(false);
+            }         
+        });
+    }
 }
 function searchPlace() {
     $('#searchPage').spin('loading');
@@ -456,40 +572,43 @@ function searchPlace() {
         }else{
             geocoder.geocode({'address': document.getElementById('B1City').value}, function(results, status) {
                 if (status == 'OK') {
-                    map.panTo(results[0].geometry.location);
                     $.post(url+'di_placeQuerys.php', {
                         tipoQuery: typeQuery,
                         lat: results[0].geometry.location.lat,
                         lng: results[0].geometry.location.lng,
                         query: document.getElementById("B1Query").options[document.getElementById("B1Query").selectedIndex].value
                     }, function(data, status) {
-                        //window.alert(JSON.stringify(data, null, 4));
-                        var contador=0;
-                        cleanMap();
-                        $.mobile.changePage("#mapPage");
-                        $("#mainNav").show();
                         var mdata = JSON.parse(data);
-                        mdata.forEach(function(k) {
-                            var marker = new google.maps.Marker({
-                                position: {
-                                    lat: k.latitud,
-                                    lng: k.longitud
-                                },
-                                //icon: iconPin,
-                                map: map,
-                                animation: google.maps.Animation.DROP
+                        if(mdata!=="Vacia"){
+                            map.panTo(results[0].geometry.location);
+                            //window.alert(JSON.stringify(data, null, 4));
+                            var contador=0;
+                            cleanMap();
+                            $.mobile.changePage("#mapPage");
+                            $("#mainNav").show();
+                            mdata.forEach(function(k) {
+                                var marker = new google.maps.Marker({
+                                    position: {
+                                        lat: k.latitud,
+                                        lng: k.longitud
+                                    },
+                                    //icon: iconPin,
+                                    map: map,
+                                    animation: google.maps.Animation.DROP
+                                });
+                                marker.addListener('click', function() {
+                                   infoWindow.setContent('<div id="content"><div id="siteNotice"></div><h2>' + k.nombre + '</h2><div id="bodyContent"><p>' + k.direccion + '</p></div></div>');
+                                   infoWindow.open(map, this);
+                                });
+                                markerArray.push(marker);
+                                contador++;
                             });
-                            marker.addListener('click', function() {
-                               infoWindow.setContent('<div id="content"><div id="siteNotice"></div><h2>' + k.nombre + '</h2><div id="bodyContent"><p>' + k.direccion + '</p></div></div>');
-                               infoWindow.open(map, this);
-                            });
-                            markerArray.push(marker);
-                            contador++;
-                        });
-                        console.log(contador);
-                        directionsDisplay.setDirections({routes: []});
-                        document.getElementById('cleanRouteIcon').style.display = 'none';
-                        document.getElementById('cleanMarkersIcon').style.display = 'inline';
+                            directionsDisplay.setDirections({routes: []});
+                            document.getElementById('cleanRouteIcon').style.display = 'none';
+                            document.getElementById('cleanMarkersIcon').style.display = 'inline';
+                        }else{
+                            window.alert('¡No se han encontrado resultados!');
+                        }
                         $('#searchPage').spin(false);
                     });
                 } else {
@@ -508,30 +627,34 @@ function searchPlace() {
             lng: userPos.lng,
             query: document.getElementById("B2Query").options[document.getElementById("B2Query").selectedIndex].value
         }, function(data, status) {
-            cleanMap();
-            $.mobile.changePage( "#mapPage");
-            $( "#mainNav" ).show();
-            map.panTo(GeoMarker.getPosition());
             var mdata = JSON.parse(data);
-            mdata.forEach(function(k) {
-                var marker = new google.maps.Marker({
-                    position: {
-                        lat: k.latitud,
-                        lng: k.longitud
-                    },
-                    //icon: iconPin,
-                    map: map,
-                    animation: google.maps.Animation.DROP
+            if(mdata!=="Vacia"){
+                cleanMap();
+                $.mobile.changePage( "#mapPage");
+                $("#mainNav").show();
+                map.panTo(GeoMarker.getPosition());
+                mdata.forEach(function(k) {
+                    var marker = new google.maps.Marker({
+                        position: {
+                            lat: k.latitud,
+                            lng: k.longitud
+                        },
+                        //icon: iconPin,
+                        map: map,
+                        animation: google.maps.Animation.DROP
+                    });
+                    marker.addListener('click', function() {
+                       infoWindow.setContent('<div id="content"><div id="siteNotice"></div><h2>' + k.nombre + '</h2><div id="bodyContent"><p>' + k.direccion + '</p></div></div>');
+                       infoWindow.open(map, this);
+                    });
+                    markerArray.push(marker);
                 });
-                marker.addListener('click', function() {
-                   infoWindow.setContent('<div id="content"><div id="siteNotice"></div><h2>' + k.nombre + '</h2><div id="bodyContent"><p>' + k.direccion + '</p></div></div>');
-                   infoWindow.open(map, this);
-                });
-                markerArray.push(marker);
-            });
-            directionsDisplay.setDirections({routes: []});
-            document.getElementById('cleanRouteIcon').style.display = 'none';
-            document.getElementById('cleanMarkersIcon').style.display = 'inline';
+                directionsDisplay.setDirections({routes: []});
+                document.getElementById('cleanRouteIcon').style.display = 'none';
+                document.getElementById('cleanMarkersIcon').style.display = 'inline';
+            }else{
+                window.alert('¡No se han encontrado resultados!');
+            }
             $('#searchPage').spin(false);
         });
     } else if (typeQuery == 3){
@@ -633,6 +756,7 @@ function setRoute(routeId){
     $('#routesPage').spin(false);
 }
 function getRoutes(){
+    var descripcion;
     $.post(url+'di_routeLoader.php', {}, function(data, status) {
         var mdata = JSON.parse(data);
         mdata.forEach(function(k) {
@@ -644,8 +768,9 @@ function getRoutes(){
                 });
                 lista=lista.concat(waypoints, "<li>"+k.gRoute.destination+"</li>");
             }else lista=lista.concat("<li>"+k.gRoute.destination+"</li>");
+            if(k.descripcion) descripcion=k.descripcion; else descripcion='Esta ruta no tiene descripción.';
             //hay que hacer query por cada id de monumento
-            $("#routesCollapsible").append("<div data-role='collapsible' class='animateCollapsible' data-collapsed-icon='carat-d' data-expanded-icon='carat-u'><h3>"+k.nombre+"</h3><div class='ui-grid-a'><div class='ui-block-a'><h4>Monumentos</h4><ul class='monList'>"+lista+"</ul></div><div class='ui-block-b'><h4>Descripción</h4>Esta es una ruta con encanto propio que sin duda dejara a aquellos que la realicen boqueabiertos por su belleza y su misterio.</div></div><div class='ui-grid-a'><div class='ui-block-a'><img id='userPhoto' src='avatar.jpg' style='border-radius: 15px; height: 30%; width: 30%;'><div id='userName'>Antonio R.</div></div><div class='ui-block-b'><button><i class='fa fa-star-half-o fa-lg'></i> Valorar ruta</button><br><button onclick='setRoute(\"" + k._id.$id + "\")'>Iniciar ruta</button></div></div>");
+            $("#routesCollapsible").append("<div data-role='collapsible' class='animateCollapsible' data-collapsed-icon='carat-d' data-expanded-icon='carat-u'><h3>"+k.nombre+"</h3><div class='ui-grid-a'><div class='ui-block-a'><h4>Monumentos</h4><ul class='monList'>"+lista+"</ul></div><div class='ui-block-b'><h4>Descripción</h4>"+descripcion+"</div></div><div class='ui-grid-a'><div class='ui-block-a'><img id='userPhoto' src='avatar.jpg' style='border-radius: 15px; height: 30%; width: 30%;'><div id='userName'>"+k.autor+"</div></div><div class='ui-block-b'><button><i class='fa fa-star-half-o fa-lg'></i> Valorar ruta</button><br><button onclick='setRoute(\"" + k._id.$id + "\")'>Iniciar ruta</button></div></div>");
             routesArray[k._id.$id]=k; 
         });
     });
@@ -689,6 +814,9 @@ $('#searchPage, #routesPage, #cityInfoPage').on("pagecreate", function(event, ui
 });
 $('#routeCreatorPage').on("pageshow", function(event, ui) {
      google.maps.event.trigger(routeMap, "resize");
+});
+$('mapPage').on("pageshow", function(event, ui) {
+     google.maps.event.trigger(map, "resize");
 });
 $(function() {
 	$("[data-role='navbar']").navbar();

@@ -5,7 +5,7 @@
       "projectTypeName": "com.intel.xdk.projecttype.jsapp",
       "src": "jsapp/template-tab-view-js/sample.zip",
       "projectGuid": "e18b9935-82b9-48e7-9693-b9c1f69b86d1",
-      "lastModifiedDate": 1495204823646,
+      "lastModifiedDate": 1496159759924,
       "creationDate": 1488386673163
     },
     "sourceDirectory": "www",
@@ -266,6 +266,53 @@
         "description": "Cordova Network Whitelist Plugin",
         "data": {},
         "dependedBy": [],
+        "custom": "true"
+      },
+      {
+        "id": "cordova-plugin-indexeddb-async",
+        "name": "cordova-plugin-indexeddb-async",
+        "version": "0.0.1",
+        "originType": "cordova.io",
+        "origin": "cordova-plugin-indexeddb-async",
+        "gitref": "",
+        "paramvals": {},
+        "sourceLocation": "plugins/cordova-plugin-indexeddb-async",
+        "selectedState": "Included",
+        "checksum": "4d192816",
+        "dependsOn": [
+          "cordova-plugin-websql-async"
+        ],
+        "topLevel": true,
+        "cordovaVersion": ">=3.0.0",
+        "author": "ABB Austin",
+        "permissions": {},
+        "description": "An asynchronous IndexedDB plug-in for Cordova apps",
+        "data": {},
+        "dependedBy": [],
+        "custom": "true"
+      },
+      {
+        "id": "cordova-plugin-websql-async",
+        "name": "Web SQL plugin",
+        "version": "1.0",
+        "originType": "repo",
+        "origin": "https://github.com/Thinkwise/cordova-plugin-websql.git",
+        "gitref": "",
+        "subdir": ".",
+        "paramvals": {},
+        "sourceLocation": "plugins/cordova-plugin-websql-async",
+        "selectedState": "Included",
+        "checksum": "b18a38ba",
+        "dependsOn": [],
+        "topLevel": false,
+        "cordovaVersion": ">=3.0.0",
+        "author": "Thinkwise",
+        "permissions": {},
+        "description": "Web Sql Plugin for Apache Cordova (based on com.msopentech.websql)",
+        "data": {},
+        "dependedBy": [
+          "cordova-plugin-indexeddb-async"
+        ],
         "custom": "true"
       }
     ],

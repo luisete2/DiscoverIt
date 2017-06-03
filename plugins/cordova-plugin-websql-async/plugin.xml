@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0" xmlns:android="http://schemas.android.com/apk/res/android"
+    id="cordova-plugin-websql-async" version="1.0">
+    <name>Web SQL plugin</name>
+    <description>Web Sql Plugin for Apache Cordova (based on com.msopentech.websql)</description>
+    <keywords>cordova, websql, db, database</keywords>
+    <author>Thinkwise</author>
+    <repo>https://github.com/Thinkwise/cordova-plugin-websql</repo>
+    <issues>https://github.com/Thinkwise/cordova-plugin-websql/issues</issues>
+
+    <platform name="windows">
+        <hook type="after_plugin_install" src="scripts/after_plugin_install.js"/>
+
+        <js-module src="www/WebSQL.js" name="WebSQL">
+            <clobbers target="window" />
+        </js-module>
+        <js-module src="www/windows/Database.js" name="Database" />
+        <js-module src="www/windows/SqlTransaction.js" name="SqlTransaction" />
+        <js-module src="src/windows/WebSqlProxy.js" name="WebSqlProxy">
+            <runs />
+        </js-module>
+    </platform>
+</plugin>

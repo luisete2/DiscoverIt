@@ -36,6 +36,9 @@
         },
         "cordova-plugin-whitelist": {
             "PACKAGE_NAME": "HelloCordova"
+        },
+        "cordova-plugin-indexeddb-async": {
+            "PACKAGE_NAME": "HelloCordova"
         }
     },
     "dependent_plugins": {
@@ -43,6 +46,9 @@
             "PACKAGE_NAME": "HelloCordova"
         },
         "cordova-plugin-device": {
+            "PACKAGE_NAME": "HelloCordova"
+        },
+        "cordova-plugin-websql-async": {
             "PACKAGE_NAME": "HelloCordova"
         }
     }
