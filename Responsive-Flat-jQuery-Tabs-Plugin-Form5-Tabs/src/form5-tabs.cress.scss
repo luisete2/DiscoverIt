@@ -1,0 +1,47 @@
+
+tabs {
+  display: block;
+  margin: 0 auto $spacing;
+  position: relative;
+
+  >nav {
+    @include user-select(none);
+
+    font-size: 0;
+
+    border-bottom: 2px solid $color-primary;
+
+    >tab {
+      cursor: pointer;
+      display: inline-block;
+      padding: 0 $spacing;
+
+      line-height: em-calc($size-medium);
+      font-size: $font-size;
+      color: $color-light;
+
+      background: $color-secondary;
+
+      &:hover { background-color: $color-secondary-darker; }
+
+      &.active,
+      &[active='true'] { background: $color-primary; }
+
+      >span { display: block; pointer-events: none; }
+    }
+  }
+
+  >tab {
+    @include clearfix();
+    display: block;
+    padding: $spacing $spacing 0;
+    background: white;
+  }
+
+  &[alive='true'] {
+    >tab {
+      display: none;
+      &.active, &[active='true'] { display: block;}
+    }
+  }
+}

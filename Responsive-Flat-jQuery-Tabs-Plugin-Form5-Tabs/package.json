@@ -1,0 +1,28 @@
+{
+  "name": "form5-tabs",
+  "version": "2.0.1",
+  "description": "jQuery tabs plugin",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/Form5/form5-tabs.git"
+  },
+  "author": {
+    "name": "Form5",
+    "email": "hello@form5.is",
+    "url": "http://www.form5.is"
+  },
+  "contributors": [
+    "Benedikt D Valdez <benedikt@form5.is>"
+  ],
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Form5/form5-tabs/issues"
+  },
+  "devDependencies": {
+    "grunt": "~0.4.2",
+    "grunt-sass": "~0.10.0",
+    "grunt-contrib-cssmin": "~0.7.0",
+    "grunt-contrib-uglify": "~0.3.2",
+    "grunt-contrib-jshint": "~0.8.0"
+  }
+}

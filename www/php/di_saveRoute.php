@@ -5,6 +5,7 @@
     $ruta['gRoute']=json_decode($_REQUEST['ruta']);
     $ruta['nombre']=$_REQUEST['nombre'];
     $ruta['descripcion']=$_REQUEST['descripcion'];
+    $ruta['city']=$_REQUEST['city'];
     $ruta['infoLugares']=json_decode($_REQUEST['arrayInfo']);
     $collection = $oDb->rutas;
     $collection->insert($ruta);

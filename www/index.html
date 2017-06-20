@@ -140,23 +140,49 @@
         </div>
         <div data-role="page" id="routesPage" data-theme="d">
             <div data-role="header">
-                <h1>Rutas</h1>
-                <div data-role="navbar">
-                    <ul>
-                        <li><a href="#populares" class="ui-btn-active">Populares</a></li>
-                        <li><a href="#buscar">Buscar</a></li>
-                        <li><a href="#descargadas">Descargadas</a></li>
-                    </ul>
+                <h1>Rutas</h1>  
+            </div>
+            <div data-role="content" style="padding:0">                                
+                <div data-role="tabs" style="border-color: #c1392b; margin:0;-webkit-border-radius: 0px;-moz-border-radius: 0px;border-radius: 0px; padding:0; ">
+                    <div data-role="navbar">
+                        <ul style="padding:0;">
+                            <li style="margin:0;border:0"><a href="#populares" class="ui-btn-active" style="width:100%; color: white;">Populares</a></li>
+                            <li style="margin:0;border:0"><a href="#buscar" style="width:100%; color: white;">Buscar</a></li>
+                            <li style="margin:0;border:0"><a href="#descargadas" style="width:100%; color: white;">Descargadas</a></li>
+                        </ul>
+                    </div>
+                    <div id="populares" style="padding:0">
+                        <div class="ui-collapsible-set" id="routesCollapsible"></div>
+                    </div>
+                    <div id="buscar">
+                        <p>Nombre</p>
+                        <input type="text" id="RName">
+                        <p>Ciudad</p>
+                        <input type="text" id="RCity">
+                        <fieldset data-role="controlgroup">
+                            <legend>Valoración</legend>
+                            <input type="radio" style="width:90%" name="RVal" id="radio-choice-v-2a" value="high">
+                            <label for="radio-choice-v-2a">Alta</label><br><br>
+                            <input type="radio" style="width:90%" name="RVal" id="radio-choice-v-2b" value="mid">
+                            <label for="radio-choice-v-2b">Media</label><br><br>
+                            <input type="radio" style="width:90%" name="RVal" id="radio-choice-v-2c" value="low">
+                            <label for="radio-choice-v-2c">Baja</label><br>
+                        </fieldset>
+                        <button id="routeSearchButton" onclick="searchRoutes()"><i class="fa fa-search fa-lg"></i> Buscar en rutas</button>
+                    </div>
+                    <div id="descargadas">
+                        <p>No hay rutas descargadas actualmente.</p>
+                    </div>
                 </div>
             </div>
-            <div id="populares">
-                <div class="ui-collapsible-set" id="routesCollapsible"></div>
-            </div>
-            <div id="buscar">
-                <p>This is the content of the tab 'Two', with the id fragment-2.</p>
-            </div>
-            <div id="descargadas">
-                <p>This is the content of the tab 'Three', with the id fragment-3.</p>
+        </div>
+        <div data-role="page" id="routeResultPage" data-theme="d">
+            <div data-role="header" data-position="fixed" data-tap-toggle="false">
+                <a data-rel="back" data-icon="carat-l" onclick='$("#mainNav").show();'>Volver</a>
+                <h1>Resultados</h1>
+            </div> 
+            <div data-role="content" style="padding:0">
+                <div class="ui-collapsible-set" id="routeResultCollapsible"></div>
             </div>
         </div>
         <div data-role="page" id="calendarPage" data-theme="d">
@@ -203,6 +229,8 @@
                 <input type="text" id="routeName"><br>
                 <p>Descripción de la ruta</p>
                 <textarea id="routeDesc"></textarea><br>
+                <p>Ciudad</p>
+                <input type="text" id="cityName"><br>
                 <button onclick="saveRoute()"><i class="fa fa-floppy-o fa-lg"></i> Guardar ruta</button>
             </div>
         </div>
@@ -221,8 +249,8 @@
             </div>
         </div>
         <div data-role="footer" data-position="fixed" data-tap-toggle="false" id="mainNav">
-            <div data-role="navbar">
-                <ul>
+            <div data-role="navbar" style="padding:0; !important;">
+                <ul style="padding:0 !important;">
                     <li><a href="#mapPage" data-ajax="false">
                         <i aria-hidden="true" class="fa fa-map fa-2x"></i>
                         <br>Mapa

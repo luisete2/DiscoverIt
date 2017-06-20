@@ -1,0 +1,58 @@
+
+tabs {
+  display: block;
+  margin: 0 auto 20px;
+  position: relative;
+
+  >nav {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    user-select: none;
+
+    font-size: 0;
+
+    border-bottom: 2px solid #DC554E;
+
+    >tab {
+      cursor: pointer;
+      display: inline-block;
+      padding: 0 20px;
+
+      line-height: 2em;
+      font-size: 16px;
+      color: #E4E7E9;
+
+      background: #36454F;
+
+      &:hover { background-color: #2D3A42; }
+
+      &.active,
+      &[active='true'] { background: #DC554E; }
+
+      >span { display: block; pointer-events: none; }
+    }
+  }
+
+  >tab {
+    display: block;
+    padding: 20px 20px 0;
+    background: white;
+
+    // Clearfix
+    &:before,
+    &:after {
+      content: " ";
+      display: table;
+    }
+    &:after {
+      clear: both;
+    }
+  }
+
+  &[alive='true'] {
+    >tab {
+      display: none;
+      &.active, &[active='true'] { display: block;}
+    }
+  }
+}

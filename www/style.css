@@ -18,6 +18,9 @@
 ul.ui-listview li{
     padding:0;
 }
+.animateCollapsible{
+    background-color: #f9f9f9;
+}
 
 /******************GLOBAL**************************/
 @-ms-viewport{
