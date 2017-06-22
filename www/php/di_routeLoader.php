@@ -7,7 +7,7 @@
         $filtro[]          = array();
         array_shift($filtro);
         if (!empty($_REQUEST['name'])) {
-            $filtro["nombre"] = $_REQUEST['name'];
+            $filtro["nombre"] = new MongoRegex('/'.$_REQUEST['name'].'/i');
         }
         if (!empty($_REQUEST['city'])) {
             $filtro["city"] = $_REQUEST['city'];

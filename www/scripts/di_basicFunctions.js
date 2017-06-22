@@ -22,7 +22,7 @@ var iconPin = {
     scaledSize: new google.maps.Size(50, 50)
 };
 
-var url='http://192.168.1.41/DiscoverIt/www/php/';
+var url='http://192.168.1.36/DiscoverIt/www/php/';
 google.maps.event.addDomListener(window, "load", initMap);
 google.maps.event.addDomListener(window, "load", initRouteMap);
 getRoutes();
@@ -763,10 +763,11 @@ function setRoute(routeId){
     $('#routesPage').spin(false);
 }
 function getRoutes(){
-    var descripcion;
+    var descripcion, valoracion;
     $.post(url+'di_routeLoader.php', {}, function(data, status){ 
         var mdata = JSON.parse(data);
         mdata.forEach(function(k) {
+            valoracion="";
             var lista="<li>"+k.gRoute.origin+"</li>";
             if("waypoints" in k.gRoute){
                 var waypoints="";
@@ -776,8 +777,11 @@ function getRoutes(){
                 lista=lista.concat(waypoints, "<li>"+k.gRoute.destination+"</li>");
             }else lista=lista.concat("<li>"+k.gRoute.destination+"</li>");
             if(k.descripcion) descripcion=k.descripcion; else descripcion='Esta ruta no tiene descripción.';
+            if(k.valoracion!=null){
+                valoracion="<div style='float:right; padding-right:2px;'><i class='fa fa-star-half-o' aria-hidden='true'></i> "+k.valoracion.toFixed(1);+"</div>";
+            }
             //hay que hacer query por cada id de monumento
-            $("#routesCollapsible").append("<div data-role='collapsible' class='animateCollapsible' data-collapsed-icon='carat-d' data-expanded-icon='carat-u'><h3>"+k.nombre+"</h3><div class='ui-grid-a'><div class='ui-block-a'><h4>Monumentos</h4><ul class='monList'>"+lista+"</ul></div><div class='ui-block-b'><h4>Descripción</h4>"+descripcion+"</div></div><div class='ui-grid-a'><div class='ui-block-a'><img id='userPhoto' src='avatar.jpg' style='border-radius: 15px; height: 30%; width: 30%;'><div id='userName'>"+k.autor+"</div></div><div class='ui-block-b'><button><i class='fa fa-star-half-o fa-lg'></i> Valorar ruta</button><br><button onclick='setRoute(\"" + k._id.$id + "\")'>Iniciar ruta</button></div></div>");
+            $("#routesCollapsible").append("<div data-role='collapsible' class='animateCollapsible' data-collapsed-icon='carat-d' data-expanded-icon='carat-u'><h3>"+k.nombre+valoracion+"</h3><div class='ui-grid-a'><div class='ui-block-a'><p><b>Monumentos</b></p><ul class='monList'>"+lista+"</ul></div><div class='ui-block-b'><p><b>Descripción</b></p><p>"+descripcion+"</p></div></div><div class='ui-grid-a'><div class='ui-block-a'><img id='userPhoto' src='avatar.jpg' style='border-radius: 15px; height: 30%; width: 30%;'><div id='userName'>"+k.autor+"</div></div><div class='ui-block-b'><p><b>Puntuar</b></p><div data-role='fieldcontain'><select data-native-menu='false' id="+k._id.$id+"><option value='5'>★★★★★</option><option value='4'>★★★★☆</option><option value='3'>★★★☆☆</option><option value='2'>★★☆☆☆</option><option value='1'>★☆☆☆☆</option><option value='0'>☆☆☆☆☆</option></select></div><button id='btn"+k._id.$id+"' onclick='saveRate(\"" +k._id.$id+ "\")'>Guardar valoración</button><button onclick='setRoute(\"" +k._id.$id+ "\")'>Iniciar ruta</button></div></div></div></div>").trigger('create');
             routesArray[k._id.$id]=k; 
         });
     });
@@ -787,7 +791,7 @@ function searchRoutes(){
         window.alert('Por favor, selecciona al menos un parámetro para realizar la busqueda.');
     }else{
         $('#routesPage').spin('loading');
-        var descripcion;
+        var descripcion, valoracion;
         if(document.getElementById('RCity').value.indexOf(',') !== -1){
             city = document.getElementById('RCity').value.substr(0, document.getElementById('RCity').value.indexOf(',')); 
         }else if(document.getElementById('RCity').value.indexOf(' ') !== -1){
@@ -802,26 +806,46 @@ function searchRoutes(){
         }, function(data, status) {
             $("#routeResultCollapsible").empty();
             var mdata = JSON.parse(data);
-            console.log(mdata);
-            mdata.forEach(function(k) {
-                var lista="<li>"+k.gRoute.origin+"</li>";
-                if("waypoints" in k.gRoute){
-                    var waypoints="";
-                    k.gRoute.waypoints.forEach(function(m){
-                        waypoints=waypoints.concat('<li>'+m.location+'</li>');
-                    });
-                    lista=lista.concat(waypoints, "<li>"+k.gRoute.destination+"</li>");
-                }else lista=lista.concat("<li>"+k.gRoute.destination+"</li>");
-                if(k.descripcion) descripcion=k.descripcion; else descripcion='Esta ruta no tiene descripción.';
-                //hay que hacer query por cada id de monumento
-                $("#routeResultCollapsible").append("<div data-role='collapsible' class='animateCollapsible' data-collapsed-icon='carat-d' data-expanded-icon='carat-u'><h3>"+k.nombre+"</h3><div class='ui-grid-a'><div class='ui-block-a'><h4>Monumentos</h4><ul class='monList'>"+lista+"</ul></div><div class='ui-block-b'><h4>Descripción</h4>"+descripcion+"</div></div><div class='ui-grid-a'><div class='ui-block-a'><img id='userPhoto' src='avatar.jpg' style='border-radius: 15px; height: 30%; width: 30%;'><div id='userName'>"+k.autor+"</div></div><div class='ui-block-b'><button><i class='fa fa-star-half-o fa-lg'></i> Valorar ruta</button><br><button onclick='setRoute(\"" + k._id.$id + "\")'>Iniciar ruta</button></div></div>").trigger('create');
-                routesArray[k._id.$id]=k; 
-            });
+            if(mdata!=="Vacia"){
+                mdata.forEach(function(k) {
+                    valoracion="";
+                    var lista="<li>"+k.gRoute.origin+"</li>";
+                    if("waypoints" in k.gRoute){
+                        var waypoints="";
+                        k.gRoute.waypoints.forEach(function(m){
+                            waypoints=waypoints.concat('<li>'+m.location+'</li>');
+                        });
+                        lista=lista.concat(waypoints, "<li>"+k.gRoute.destination+"</li>");
+                    }else lista=lista.concat("<li>"+k.gRoute.destination+"</li>");
+                    if(k.descripcion) descripcion=k.descripcion; else descripcion='Esta ruta no tiene descripción.';
+                    if(k.valoracion!=null){
+                        valoracion="<div style='float:right; padding-right:2px;'><i class='fa fa-star-half-o' aria-hidden='true'></i>"+k.valoracion.toFixed(1)+"</div>";
+                    }
+                    //hay que hacer query por cada id de monumento
+                    $("#routeResultCollapsible").append("<div data-role='collapsible' class='animateCollapsible' data-collapsed-icon='carat-d' data-expanded-icon='carat-u'><h3>"+k.nombre+valoracion+"</h3><div class='ui-grid-a'><div class='ui-block-a'><p><b>Monumentos</b></p><ul class='monList'>"+lista+"</ul></div><div class='ui-block-b'><p><b>Descripción</b></p><p>"+descripcion+"</p></div></div><div class='ui-grid-a'><div class='ui-block-a'><img id='userPhoto' src='avatar.jpg' style='border-radius: 15px; height: 30%; width: 30%;'><div id='userName'>"+k.autor+"</div></div><div class='ui-block-b'><p><b>Puntuar</b></p><div data-role='fieldcontain'><select data-native-menu='false' id="+k._id.$id+"><option value='5'>★★★★★</option><option value='4'>★★★★☆</option><option value='3'>★★★☆☆</option><option value='2'>★★☆☆☆</option><option value='1'>★☆☆☆☆</option><option value='0'>☆☆☆☆☆</option></select></div><button id='btn"+k._id.$id+"' onclick='saveRate(\"" +k._id.$id+ "\")'>Guardar valoración</button><button onclick='setRoute(\"" +k._id.$id+ "\")'>Iniciar ruta</button></div></div></div></div>").trigger('create');
+                    routesArray[k._id.$id]=k; 
+                });
+                $("#mainNav").hide();
+                $.mobile.changePage( "#routeResultPage");
+            }else{
+                window.alert('¡No se han encontrado rutas con esos parámetros!')
+            }
             $('#routesPage').spin(false);
-            $("#mainNav").hide();
-            $.mobile.changePage( "#routeResultPage");$
         });
     }
+}
+function saveRate(routeId){
+    $.post(url+'di_saveRate.php', {
+        rating: $("#"+routeId).val(),
+        route: routeId
+    }, function(data, status){
+        if(data=='SUCCESS'){
+            window.alert('¡Valoración guardada con éxito!');
+            $("#btn"+routeId).prop("disabled",true);
+        }else{
+            window.alert('Algo falló O.o');
+        }
+    });    
 }
 //AUTOCOMPLETAR Y DETALLES GRÁFICOS
 $("#B3City").autocomplete({
