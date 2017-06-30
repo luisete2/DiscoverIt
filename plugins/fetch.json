@@ -66,14 +66,6 @@
         "is_top_level": true,
         "variables": {}
     },
-    "buildfire-cordova-plugin-calendar": {
-        "source": {
-            "type": "registry",
-            "id": "buildfire-cordova-plugin-calendar"
-        },
-        "is_top_level": true,
-        "variables": {}
-    },
     "com-badrit-base64": {
         "source": {
             "type": "git",
@@ -87,14 +79,6 @@
         "source": {
             "type": "local",
             "path": "C:\\Users\\usuario\\AppData\\Local\\Intel\\XDK\\xdk\\components\\server\\cordova\\cordova-plugins\\cordova-plugin-whitelist"
-        },
-        "is_top_level": true,
-        "variables": {}
-    },
-    "cordova-plugin-indexeddb-async": {
-        "source": {
-            "type": "registry",
-            "id": "cordova-plugin-indexeddb-async"
         },
         "is_top_level": true,
         "variables": {}

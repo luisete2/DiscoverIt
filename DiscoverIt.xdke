@@ -16,7 +16,7 @@
       "tinyhippos-geosettings": {
         "id": "tinyhippos-geosettings",
         "key": "geosettings",
-        "value": "{\"position\":{\"latitude\":43.01210888073934,\"longitude\":-80.44280141901545,\"altitude\":100,\"accuracy\":150,\"altitudeAccuracy\":80,\"heading\":0,\"speed\":0,\"timeStamp\":\"new Date(1490952727511)\"},\"delay\":\"0\",\"timeout\":false}",
+        "value": "{\"position\":{\"latitude\":43.01210888073934,\"longitude\":-80.44280141901545,\"altitude\":100,\"accuracy\":150,\"altitudeAccuracy\":80,\"heading\":0,\"speed\":0,\"timeStamp\":\"new Date(1498849403400)\"},\"delay\":\"0\",\"timeout\":false}",
         "prefix": "tinyhippos-"
       },
       "tinyhippos-geo-map-zoom-key": {

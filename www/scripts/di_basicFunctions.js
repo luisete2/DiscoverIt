@@ -1,15 +1,62 @@
 /* jshint browser: true */
 //PRIMERA INICIALIZACION
-document.addEventListener("deviceready", onDeviceReady, false);
-function onDeviceReady() {
+document.addEventListener('deviceready', function() {
     pictureSource = navigator.camera.PictureSourceType;
     destinationType = navigator.camera.DestinationType;
     //intel.xdk.device.setRotateOrientation('portrait');
     //window.StatusBar.show();
-    window.StatusBar.backgroundColorByHexString('#000000');
+    db = openDatabase("local.db", '1.0', "LocalDB", 4 * 1024 * 1024);
+    /*db.transaction(function (tx) {
+        tx.executeSql("DROP TABLE localEvents");
+    });*/
+    db.transaction(function (tx) {
+        tx.executeSql("CREATE TABLE IF NOT EXISTS localEvents (id text primary key, title text, start text, end text)");
+    });
+    db.transaction(function (tx) {
+        tx.executeSql("SELECT * FROM localEvents", [], function(tx, results) {
+            if(results.rows.length > 0) {
+                for(var i = 0; i < results.rows.length; i++) {
+                    events.push({
+                        id: results.rows.item(i).id,
+                        title: results.rows.item(i).title,
+                        start: results.rows.item(i).start,
+                        end: results.rows.item(i).end
+                    });
+                }
+                $('#calendar').fullCalendar( 'addEventSource', events);
+            }
+        });
+    });
+    $('input.timepicker').timepicker({
+        timeFormat: 'HH:mm',
+        interval: 10,
+        minTime: '00:00 AM',
+        maxTime: '11:50 PM',
+        defaultTime: '12:00 PM',
+        startTime: '00:00',
+        dynamic: false,
+        dropdown: true,
+        scrollbar: true
+    });
+    $('#calendar').fullCalendar({
+        events: events,
+        eventLimit: true, 
+        header: {
+            left:   'prev',
+            center: 'title',
+            right:  'next'
+        },
+        dayClick: function(date, jsEvent, view) {
+            if(view.name == 'month' || view.name == 'basicWeek') {
+                $('#calendar').fullCalendar('changeView', 'basicDay');
+                $('#calendar').fullCalendar('gotoDate', date);
+                $('#backDay').css('display', 'block');
+            }
+        }
+    });
     window.StatusBar.overlaysWebView(false);
-    //google.maps.event.addDomListener(window, 'load', initMap);
-}
+    window.StatusBar.backgroundColorByHexString('#000000');
+});
 $("#routeCreatorNav").hide();
 $('#confirmRoute').addClass('ui-state-disabled');
 //VARIABLES
@@ -21,12 +68,11 @@ var iconPin = {
     anchor: new google.maps.Point(25, 50),
     scaledSize: new google.maps.Size(50, 50)
 };
-
-var url='http://192.168.1.36/DiscoverIt/www/php/';
+var url='http://192.168.1.43/DiscoverIt/www/php/';
 google.maps.event.addDomListener(window, "load", initMap);
 google.maps.event.addDomListener(window, "load", initRouteMap);
 getRoutes();
-var map, routeMap, marker, mousedUp = false, service, directionsDisplay, typeQuery=0, request;
+var db, events=[], map, routeMap, marker, mousedUp = false, service, directionsDisplay, typeQuery=0, request;
 var geocoder = new google.maps.Geocoder(), GeoMarker = new GeolocationMarker();
 var routesArray = [], infoWindow= new google.maps.InfoWindow();
 var rDirectionsService = new google.maps.DirectionsService();
@@ -778,10 +824,10 @@ function getRoutes(){
             }else lista=lista.concat("<li>"+k.gRoute.destination+"</li>");
             if(k.descripcion) descripcion=k.descripcion; else descripcion='Esta ruta no tiene descripción.';
             if(k.valoracion!=null){
-                valoracion="<div style='float:right; padding-right:2px;'><i class='fa fa-star-half-o' aria-hidden='true'></i> "+k.valoracion.toFixed(1);+"</div>";
+                valoracion="<div style='float:right; padding-right:2px;'><i class='fa fa-star-half-o' aria-hidden='true'></i> "+k.valoracion.toFixed(1)+"</div>";
             }
             //hay que hacer query por cada id de monumento
-            $("#routesCollapsible").append("<div data-role='collapsible' class='animateCollapsible' data-collapsed-icon='carat-d' data-expanded-icon='carat-u'><h3>"+k.nombre+valoracion+"</h3><div class='ui-grid-a'><div class='ui-block-a'><p><b>Monumentos</b></p><ul class='monList'>"+lista+"</ul></div><div class='ui-block-b'><p><b>Descripción</b></p><p>"+descripcion+"</p></div></div><div class='ui-grid-a'><div class='ui-block-a'><img id='userPhoto' src='avatar.jpg' style='border-radius: 15px; height: 30%; width: 30%;'><div id='userName'>"+k.autor+"</div></div><div class='ui-block-b'><p><b>Puntuar</b></p><div data-role='fieldcontain'><select data-native-menu='false' id="+k._id.$id+"><option value='5'>★★★★★</option><option value='4'>★★★★☆</option><option value='3'>★★★☆☆</option><option value='2'>★★☆☆☆</option><option value='1'>★☆☆☆☆</option><option value='0'>☆☆☆☆☆</option></select></div><button id='btn"+k._id.$id+"' onclick='saveRate(\"" +k._id.$id+ "\")'>Guardar valoración</button><button onclick='setRoute(\"" +k._id.$id+ "\")'>Iniciar ruta</button></div></div></div></div>").trigger('create');
+            $("#routesCollapsible").append("<div data-role='collapsible' class='animateCollapsible' data-collapsed-icon='carat-d' data-expanded-icon='carat-u'><h3>"+k.nombre+valoracion+"</h3><div class='ui-grid-a'><div class='ui-block-a'><p><b>Monumentos</b></p><ul class='monList'>"+lista+"</ul></div><div class='ui-block-b'><p><b>Descripción</b></p><p>"+descripcion+"</p></div></div><div class='ui-grid-a'><div class='ui-block-a'><p><b>Creada por:</b></p><div id='userName'>"+k.autor+"</div><br><div id='icons"+k._id.$id+"'><a href='#eventConfigPage' onclick='toEventSchedule(\"" +k._id.$id+ "\",\"" +k.nombre+ "\")'><i class='fa fa-calendar-plus-o fa-2x'></i></a></div></div><div class='ui-block-b'><div data-role='fieldcontain' style='padding:0;'><select data-native-menu='false' id="+k._id.$id+"><option value='5'>★★★★★</option><option value='4'>★★★★☆</option><option value='3'>★★★☆☆</option><option value='2'>★★☆☆☆</option><option value='1'>★☆☆☆☆</option><option value='0'>☆☆☆☆☆</option></select></div><button id='btn"+k._id.$id+"' onclick='saveRate(\"" +k._id.$id+ "\")'><i class='fa fa-star-half-o'></i> Valorar</button><button onclick='setRoute(\"" +k._id.$id+ "\")'>Iniciar ruta</button></div></div></div></div>").trigger('create');
             routesArray[k._id.$id]=k; 
         });
     });
@@ -822,7 +868,7 @@ function searchRoutes(){
                         valoracion="<div style='float:right; padding-right:2px;'><i class='fa fa-star-half-o' aria-hidden='true'></i>"+k.valoracion.toFixed(1)+"</div>";
                     }
                     //hay que hacer query por cada id de monumento
-                    $("#routeResultCollapsible").append("<div data-role='collapsible' class='animateCollapsible' data-collapsed-icon='carat-d' data-expanded-icon='carat-u'><h3>"+k.nombre+valoracion+"</h3><div class='ui-grid-a'><div class='ui-block-a'><p><b>Monumentos</b></p><ul class='monList'>"+lista+"</ul></div><div class='ui-block-b'><p><b>Descripción</b></p><p>"+descripcion+"</p></div></div><div class='ui-grid-a'><div class='ui-block-a'><img id='userPhoto' src='avatar.jpg' style='border-radius: 15px; height: 30%; width: 30%;'><div id='userName'>"+k.autor+"</div></div><div class='ui-block-b'><p><b>Puntuar</b></p><div data-role='fieldcontain'><select data-native-menu='false' id="+k._id.$id+"><option value='5'>★★★★★</option><option value='4'>★★★★☆</option><option value='3'>★★★☆☆</option><option value='2'>★★☆☆☆</option><option value='1'>★☆☆☆☆</option><option value='0'>☆☆☆☆☆</option></select></div><button id='btn"+k._id.$id+"' onclick='saveRate(\"" +k._id.$id+ "\")'>Guardar valoración</button><button onclick='setRoute(\"" +k._id.$id+ "\")'>Iniciar ruta</button></div></div></div></div>").trigger('create');
+                    $("#routeResultCollapsible").append("<div data-role='collapsible' class='animateCollapsible' data-collapsed-icon='carat-d' data-expanded-icon='carat-u'><h3>"+k.nombre+valoracion+"</h3><div class='ui-grid-a'><div class='ui-block-a'><p><b>Monumentos</b></p><ul class='monList'>"+lista+"</ul></div><div class='ui-block-b'><p><b>Descripción</b></p><p>"+descripcion+"</p></div></div><div class='ui-grid-a'><div class='ui-block-a'><p><b>Creada por:</b></p><div id='userName'>"+k.autor+"</div><br><div id='icons"+k._id.$id+"'><a href='#eventConfigPage' onclick='toEventSchedule(\"" +k._id.$id+ "\",\"" +k.nombre+ "\")'><i class='fa fa-calendar-plus-o fa-2x'></i></a></div></div><div class='ui-block-b'><div data-role='fieldcontain' style='padding:0;'><select data-native-menu='false' id="+k._id.$id+"><option value='5'>★★★★★</option><option value='4'>★★★★☆</option><option value='3'>★★★☆☆</option><option value='2'>★★☆☆☆</option><option value='1'>★☆☆☆☆</option><option value='0'>☆☆☆☆☆</option></select></div><button id='btn"+k._id.$id+"' onclick='saveRate(\"" +k._id.$id+ "\")'><i class='fa fa-star-half-o'></i> Valorar</button><button onclick='setRoute(\"" +k._id.$id+ "\")'>Iniciar ruta</button></div></div></div></div>").trigger('create');
                     routesArray[k._id.$id]=k; 
                 });
                 $("#mainNav").hide();
@@ -846,6 +892,32 @@ function saveRate(routeId){
             window.alert('Algo falló O.o');
         }
     });    
+}
+function toEventSchedule(routeId, routeName){
+    $("#mainNav").hide();
+    $('#idEvent').attr('value', routeId);
+    $('#nameEvent').attr('value', routeName);
+}
+function addEvent(){
+    if(!$('#dateEvent').val()){
+        window.alert('Por favor, introduce un dia para realizar la ruta.');
+    }else{
+        var event= {
+            id: $('#idEvent').val(),
+            title: $('#nameEvent').val(),
+            start: $('#dateEvent').val()+" "+$('#timeBeginEvent').val(),
+            end: $('#dateEvent').val()+" "+$('#timeEndEvent').val()
+        };
+        db.transaction(function (tx) {
+            tx.executeSql("INSERT INTO localEvents (id, title, start, end) VALUES (?,?,?,?)", [$('#idEvent').val(), $('#nameEvent').val(),$('#dateEvent').val()+" "+$('#timeBeginEvent').val(),$('#dateEvent').val()+" "+$('#timeEndEvent').val()]);
+        });
+        $("#calendar").fullCalendar('renderEvent', event, true);
+        $('#calendar').fullCalendar('changeView', 'basicDay');
+        $('#calendar').fullCalendar('gotoDate', $('#dateEvent').val());
+        $('#backDay').css('display', 'block');
+        $.mobile.changePage( "#calendarPage");
+        $("#mainNav").show();         
+    }
 }
 //AUTOCOMPLETAR Y DETALLES GRÁFICOS
 $("#B3City").autocomplete({
@@ -887,8 +959,11 @@ $('#searchPage, #routesPage, #cityInfoPage, #routeResultPage').on("pagecreate", 
 $('#routeCreatorPage').on("pageshow", function(event, ui) {
      google.maps.event.trigger(routeMap, "resize");
 });
-$('mapPage').on("pageshow", function(event, ui) {
-     google.maps.event.trigger(map, "resize");
+$('#mapPage').on("pageshow", function(event, ui) {
+     //google.maps.event.trigger(map, "resize");
+});
+$('#calendarPage').on("pageshow", function(event, ui) {
+    $('#calendar').fullCalendar('render');
 });
 $(function() {
 	$("[data-role='navbar']").navbar();
