@@ -21,10 +21,10 @@
                 $filtro['valoracion']=['$lte'=> 2, '$gte'=> 0];
             }
         }
-        $table      = $collection->find($filtro);
+        $table      = $collection->find($filtro)->sort(array('valoracion' => -1))->limit(25);
         //print_r($filtro);
     }else{
-        $table     = $collection->find();
+        $table     = $collection->find()->sort(array('valoracion' => -1))->limit(25);
     }
     if($table->count()==0){
         $obj="Vacia";
