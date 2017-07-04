@@ -1,6 +1,7 @@
 /* jshint browser: true */
 //PRIMERA INICIALIZACION
 document.addEventListener('deviceready', function() {
+    console.log(getCookie('username'));
     pictureSource = navigator.camera.PictureSourceType;
     destinationType = navigator.camera.DestinationType;
     //intel.xdk.device.setRotateOrientation('portrait');
@@ -471,6 +472,22 @@ function calcRoute() {
     });
     $('#confirmRoute').removeClass('ui-state-disabled');
 }
+function getCookie(name) {
+    var dc = document.cookie;
+    var prefix = name + "=";
+    var begin = dc.indexOf("; " + prefix);
+    if (begin == -1) {
+        begin = dc.indexOf(prefix);
+        if (begin != 0) return null;
+    }else{
+        begin += 2;
+        var end = document.cookie.indexOf(";", begin);
+        if (end == -1) {
+        end = dc.length;
+        }
+    }
+    return decodeURI(dc.substring(begin + prefix.length, end));
+} 
 function clearMarkers(array) {
     for (var i = 0; i < array.length; i++) {
         array[i].setMap(null);
@@ -1126,6 +1143,23 @@ $(function() {
 });
 function capitalizeFirstLetter(string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
+}
+function testConnection() {
+    var xhr = new XMLHttpRequest();
+    var file = "https://www.kirupa.com/blank.png";
+    var randomNum = Math.round(Math.random() * 10000);
+    xhr.open('HEAD', file + "?rand=" + randomNum, true);
+    xhr.send();
+    xhr.addEventListener("readystatechange", processRequest, false);
+    function processRequest(e) {
+        if (xhr.readyState == 4) {
+            if (xhr.status >= 200 && xhr.status < 304) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+    }
 }
 
 //SECCION FOTOS (DEPRECADA)
