@@ -12,13 +12,13 @@
         <link href="css/jquery.spin.css" rel="stylesheet" type="text/css"/>
         <link href="css/style.css" rel="stylesheet" type="text/css"/>
         <link href="css/jquery.timepicker.min.css" rel="stylesheet">
+        <link href="css/font-awesome.min.css" rel="stylesheet">
         <script src="lib/jquery.min.js"></script>
         <script src="lib/jquery-ui.min.js"></script>
         <script src="lib/spin.min.js" type="text/javascript"></script>
         <script src="lib/jquery.spin.js" type="text/javascript"></script>
         <script src="lib/jquery.mobile-1.4.5.min.js"></script>
         <script src="lib/jquery.timepicker.min.js"></script>
-        <script src="lib/fontawesome.js"></script>
         <script charset="utf-8" src="lib/fastclick.min.js" type="text/javascript"></script>
         <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?libraries=places&key=AIzaSyCUTg59OdxJKdSgeIo5qiUDUZM2AyNK8RQ"></script>
         <script charset="utf-8" src="lib/geolocation-marker.js" type="text/javascript"></script>
@@ -123,20 +123,18 @@
             </div>
             <div data-role="content">
                 <fieldset class="ui-grid-a">
-                    <div id='userName' class="ui-block-a" style="width:70%;"></div>
                     <div class="field-contain ui-block-a" style="width:100%;">
-                        <label for="email" style="width:30%; margin: 4px 0;">E-Mail</label>
-                        <input type="text" style="width:70%;" id="email" value="emailejemplo@correo.eso" readonly>	
+                        <label for="username" style="width:30%; margin: 4px 0;">Username</label>
+                        <input type="text" style="width:70%;" id="username" readonly>	
                     </div>
                     <div class="field-contain ui-block-a" style="width:100%;">
                         <label for="pass" style="width:30%; margin: 4px 0;">Password</label>
                         <input type="password" style="width:70%;" id="pass" value="lolololol" readonly>
                     </div>
                 </fieldset>
-                <button data-role="button">Modificar datos</button>
-                <button data-role="button">Borrar cuenta</button>
-                <button data-role="button">Rutas favoritas</button>
-                <a data-role="button" href="#routeCreatorPage" onclick='$("#routeCreatorNav").show();'>Crear ruta</a>
+                <button data-role="button" id="deleteAccount" onclick="borrarCuenta()" style="padding:0; margin:0">Borrar cuenta</button>
+                <button data-role="button" onclick="logOut()">Cerrar sesión</button>
+                <a data-role="button" id="toRouteCreator" href="#routeCreatorPage" onclick='$("#routeCreatorNav").show();' style="margin:0; padding:0">Crear ruta</a>
                 <a data-role="button" href="#myRoutesPage">Mis rutas</a>
             </div>
         </div>
@@ -153,13 +151,13 @@
             <div data-role="header">
                 <h1>Rutas</h1>
             </div>
-            <div data-role="content" style="padding:0; font-size:80%">                                
+            <div data-role="content" style="padding:0; font-size:80%">
                 <div data-role="tabs" style="border-color: #c1392b; margin:0;-webkit-border-radius: 0px;-moz-border-radius: 0px;border-radius: 0px; padding:0;">
                     <div data-role="navbar">
                         <ul style="padding:0;">
                             <li style="margin:0;border:0"><a href="#populares" class="ui-btn-active" style="width:100%; color: white;">Populares</a></li>
                             <li style="margin:0;border:0"><a href="#buscar" style="width:100%; color: white;">Buscar</a></li>
-                            <li style="margin:0;border:0"><a href="#descargadas" style="width:100%; color: white;">Descargadas</a></li>
+                            <li style="margin:0;border:0"><a href="#favoritas" style="width:100%; color: white;">Favoritas</a></li>
                         </ul>
                     </div>
                     <div id="populares" style="padding:0">
@@ -179,10 +177,10 @@
                             <input type="radio" style="width:90%" name="RVal" id="radio-choice-v-2c" value="low">
                             <label style='width:100%' for="radio-choice-v-2c">Baja</label><br>
                         </fieldset>
-                        <button id="routeSearchButton" onclick="searchRoutes()"><i class="fa fa-search fa-lg"></i> Buscar en rutas</button>
+                        <button id="routeSearchButton" onclick="searchRoutes()" style="margin:0; padding:0"><i class="fa fa-search fa-lg"></i> Buscar en rutas</button>
                     </div>
-                    <div id="descargadas" style="padding:0">
-                        <div class="ui-collapsible-set" id="dloadRoutesCollapsible"></div>
+                    <div id="favoritas" style="padding:0">
+                        <div class="ui-collapsible-set" id="favoriteRoutesCollapsible"></div>
                     </div>
                 </div>
             </div>
