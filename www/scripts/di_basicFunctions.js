@@ -72,7 +72,7 @@ document.addEventListener('deviceready', function() {
                             end: results.rows.item(i).end
                         });
                     }
-                    $('#calendar').fullCalendar( 'addEventSource', events);
+                    $('#calendar').fullCalendar('addEventSource', events);
                 }
             });
         });
@@ -452,12 +452,12 @@ function addMarker(marker) {
     }   
 }
 function placeMarker(marker){
-    if(marker.hasOwnProperty('extraInfo')){
+    if(marker.hasOwnProperty('nombre')){
         rMarkerArray.push(new google.maps.Marker({
             position: marker.position, 
             map: routeMap,
             icon: 'http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld='+(rMarkerArray.length+1)+'|58ACFA|000000',
-            extraInfo: marker.extraInfo,
+            nombre: marker.nombre,
             pos: marker.pos
             //draggable: true,
         }));  
@@ -482,7 +482,7 @@ function undoMarker() {
             rDestination=rMarkerArray[rMarkerArray.length-2].position;
         }
         rMarkerArray[rMarkerArray.length-1].setMap(null);
-        if(rMarkerArray[rMarkerArray.length-1].hasOwnProperty('extraInfo') && bMarkerArray.length !== 0){
+        if(rMarkerArray[rMarkerArray.length-1].hasOwnProperty('nombre') && bMarkerArray.length !== 0){
             bMarkerArray[rMarkerArray[rMarkerArray.length-1].pos].setMap(routeMap);
         }
         rMarkerArray.pop();
@@ -555,10 +555,8 @@ function saveRoute(){
         var infoPlaces=[];
         rMarkerArray.forEach(function(element){
             var place = new Object();
-            if(element.hasOwnProperty('extraInfo')){
-                place.nombre=element.extraInfo.nombre;
-                place.descripcion=element.extraInfo.descripcion;
-                place.direccion=element.extraInfo.localizacion.direccion;
+            if(element.hasOwnProperty('nombre')){
+                place.nombre=element.nombre;
                 infoPlaces.push(place);
             }else{
                 place.nombre='Par de coord.'
@@ -608,6 +606,17 @@ function cleanRouteMap() {
     bMarkerArray = [];
     document.getElementById('cleanRCMarkersIcon').style.display = 'none';
 }
+function toRouteCreator(){
+    $('#routesPage').spin('loading');
+    if(testConnection()==true){
+        $.mobile.changePage("#routeCreatorPage");
+        $("#mainNav").hide();
+        $("#routeCreatorNav").show();
+    }else{
+        window.alert('Por favor, conecta tu movil a internet para crear rutas.')
+    }
+    $('#routesPage').spin(false);
+}
 function searchRCPlace() {
     $('#searchRCPage').spin('loading');
     if(!document.getElementById('RCCity').value){
@@ -637,38 +646,26 @@ function searchRCPlace() {
                         mdata.forEach(function(k) {
                             var marker = new google.maps.Marker({
                                 position: {
-                                    lat: k.localizacion.punto.latitud,
-                                    lng: k.localizacion.punto.longitud
+                                    lat: Number(k.latitude),
+                                    lng: Number(k.longitude)
                                 },
-                                //icon: iconPin,
                                 map: routeMap,
                                 pos: contador,
-                                extraInfo: k
+                                nombre: k.nombre,
                                 //animation: google.maps.Animation.DROP
                             });
                             marker.addListener('click', function() {
-                                infoWindow.setContent('<div id="content"><div id="siteNotice"></div><h2>' + k.nombre + '</h2><div id="bodyContent"><p>' + k.localizacion.direccion + '</p></div></div>');
+                                infoWindow.setContent("<div id='content'><div id='siteNotice'></div><h2>" + k.nombre + "</h2><div id='bodyContent'><p>Aqui va la info</p></div><i id='iW"+contador+"' class='fa fa-plus-circle fa-2x' style='text-align:right;' aria-hidden='true'></i><i id='iP"+contador+"' class='fa fa-info-circle fa-2x' style='text-align:right;' aria-hidden='true'></i></div>");           
                                 infoWindow.open(routeMap, this);
-                            });
-                            marker.addListener('mouseup', function(e){ 
-                                mousedUp = true;
-                            });
-                            marker.addListener('dragstart', function(e){ 
-                                mousedUp = true;
-                            });
-                            marker.addListener('dragend', function(e){ 
-                                mousedUp = true;
-                            });
-                            marker.addListener('zoom_changed', function(e){ 
-                                mousedUp = true;
-                            });
-                            marker.addListener('mousedown', function(e) {
-                                mousedUp = false;
-                                setTimeout(function(){
+                                $('#iW'+contador).click(function(){
                                     addMarker(marker);
                                     marker.setMap(null);
-                                }, 400);
-                            });                           
+                                });
+                                $('#iP'+contador).click(function() {
+                                    $.mobile.changePage("#infoRCPage"); 
+                                    $("#routeCreatorNav").hide();
+                                });
+                            });       
                             bMarkerArray.push(marker);
                             contador++;
                         });
@@ -1194,22 +1191,22 @@ function testConnection() {
 }
 function checkIfOnline(){
     if(testConnection()==false){
-        if (window.location.href.indexOf("routeCreatorPage") > -1 || window.location.href.indexOf("routeCreator2Page") > -1 || window.location.href.indexOf("searchRCPage") > -1){
+        if (window.location.href.indexOf("routeCreatorPage") > -1 || window.location.href.indexOf("routeCreator2Page") > -1 || window.location.href.indexOf("searchRCPage") > -1 || window.location.href.indexOf("infoRCPage") > -1){
             window.alert('Se ha perdido la conexión a internet. Por favor, conecta el dispositivo de nuevo para completar la ruta.');
-            $.mobile.changePage("#userPage");
+            $.mobile.changePage("#routesPage");
+            $('#mainNav').show();
+            $('#routeCreatorNav').hide();
         }
         if (window.location.href.indexOf("searchPage") > -1){
             window.alert('Se ha perdido la conexión a internet. Por favor, conecta el dispositivo de nuevo para realizar la búsqueda.');
             $.mobile.changePage("#mapPage");
         }
         //$(".btn"+routeId).prop("disabled",true);
-        $("#toRouteCreator").button().button('disable');
         $("#routeSearchButton").button().button('disable');
         $('#deleteAccount').button().button('disable'); 
         $('#reloadRoutes').button().button('disable'); 
         $('#searchIcon').hide();
     }else{
-        $("#toRouteCreator").button().button('enable'); 
         $("#routeSearchButton").button().button('enable'); 
         $('#deleteAccount').button().button('enable'); 
         $('#reloadRoutes').button().button('enable'); 

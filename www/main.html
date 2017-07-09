@@ -134,7 +134,6 @@
                 </fieldset>
                 <button data-role="button" id="deleteAccount" onclick="borrarCuenta()" style="padding:0; margin:0">Borrar cuenta</button>
                 <button data-role="button" onclick="logOut()">Cerrar sesión</button>
-                <a data-role="button" id="toRouteCreator" href="#routeCreatorPage" onclick='$("#routeCreatorNav").show();' style="margin:0; padding:0">Crear ruta</a>
                 <a data-role="button" href="#myRoutesPage">Mis rutas</a>
             </div>
         </div>
@@ -158,6 +157,7 @@
                             <li style="margin:0;border:0"><a href="#populares" class="ui-btn-active" style="width:100%; color: white;">Populares</a></li>
                             <li style="margin:0;border:0"><a href="#buscar" style="width:100%; color: white;">Buscar</a></li>
                             <li style="margin:0;border:0"><a href="#favoritas" style="width:100%; color: white;">Favoritas</a></li>
+                            <li style="margin:0;border:0"><a href="#populares" onclick="toRouteCreator()" style="width:100%; color: white;">Crear</a></li>
                         </ul>
                     </div>
                     <div id="populares" style="padding:0">
@@ -226,7 +226,7 @@
         </div> 
         <div data-role="page" id="routeCreatorPage" data-theme="d">
             <div data-role="header" data-position="fixed" data-tap-toggle="false">
-                <a data-rel="back" data-icon="carat-l" onclick='$("#routeCreatorNav").hide(); resetRoute();'>Volver</a>
+                <a href="#routesPage" data-icon="carat-l" onclick='$("#routeCreatorNav").hide();$("#mainNav").show(); resetRoute();'>Volver</a>
                 <h1>Creador de rutas</h1>
             </div>
             <div data-role="content" style="padding:0">
@@ -235,7 +235,7 @@
                     <i class="fa fa-map-marker fa-stack-2x"></i>
                     <i class="fa fa-times fa-stack-2x" style="color:red;"></i>
                 </span>
-                <a href="#searchRCPage" onclick='$( "routeCreatorNav" ).hide();'><i class="fa fa-search fa-3x" aria-hidden="true" style="position: absolute; top: 12%; right: 3%;" id="searchRCIcon"></i></a>
+                <a href="#searchRCPage"><i class="fa fa-search fa-3x" aria-hidden="true" style="position: absolute; top: 12%; right: 3%;" id="searchRCIcon" onclick='$("#routeCreatorNav").hide();'></i></a>
             </div>
             <div data-role="footer" data-position="fixed" data-tap-toggle="false" id="routeCreatorNav">
                 <div data-role="navbar">
@@ -265,6 +265,15 @@
                 <p>Ciudad</p>
                 <input type="text" id="cityName"><br>
                 <button onclick="saveRoute()"><i class="fa fa-floppy-o fa-lg"></i> Guardar ruta</button>
+            </div>
+        </div>
+        <div data-role="page" id="infoRCPage" data-theme="d">
+            <div data-role="header" data-position="fixed" data-tap-toggle="false">
+                <a data-rel="back" data-icon="carat-l" onclick='$("#routeCreatorNav").show();'>Volver</a>
+                <h1>Información</h1>
+            </div>
+            <div data-role="content">
+                
             </div>
         </div>
         <div data-role="page" id="searchRCPage" data-theme="d">

@@ -38,9 +38,9 @@
         $oConn = new MongoClient("mongodb://localhost");
         $oDb   = $oConn->TFG;
         set_time_limit (1200);
-        $collection = $oDb->pruebas;
+        $collection = $oDb->monumentos;
         $obj=[];
-        $filtro['localizacion.ciudad'] = $_REQUEST['city'];
+        $filtro['ciudad'] = $_REQUEST['city'];
         $table = $collection->find($filtro);
         if($table->count()==0){
             $final="Vacia";

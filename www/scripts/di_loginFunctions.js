@@ -34,6 +34,7 @@ function confirmRegistry() {
                 password: document.getElementById('password').value,
                 confirmarRegistro: true
             }, function(data, status) {
+                console.log(data);
                 if(data=='Usuario existente'){
                     window.alert('Ya existe un usuario con ese nombre. Por favor, introduce otro nombre o inicia sesión si eres este usuario.')
                 }else if(data=="Registro exitoso"){
@@ -80,7 +81,7 @@ function confirmLogin () {
                             password: document.getElementById('log-password').value,
                             iniciarSesion: true
                         }, function(data, status) {
-                            //console.log(data);
+                            console.log(data);
                             if(data=="Login exitoso"){
                                 tx.executeSql("INSERT INTO localUsers (nick, pass) VALUES (?,?)", [document.getElementById('log-uname').value, $.base64.encode(document.getElementById('log-password').value, true)]);
                                 document.cookie = "username="+document.getElementById('log-uname').value+"; path=/";
