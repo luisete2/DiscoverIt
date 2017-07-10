@@ -1,6 +1,7 @@
 /* jshint browser: true */
 //PRIMERA INICIALIZACION
 document.addEventListener('deviceready', function() {
+    $('#all').spin('loading');
     if(getCookie('username')==null){
         window.alert('Por favor, inicia sesión para acceder al contenido.');
         window.location.replace("index.html");
@@ -10,15 +11,15 @@ document.addEventListener('deviceready', function() {
                 autor: getCookie('username')
             }, function(data, status) {
                 var mdata=JSON.parse(data);
-                mdata.rutas_valoradas.forEach(function (e){
-                    rutasValoradas.push(e);
-                });
+                if(mdata.hasOwnProperty('rutas_valoradas')){
+                    mdata.rutas_valoradas.forEach(function (e){
+                        rutasValoradas.push(e);
+                    });
+                }
             });
         }
         pictureSource = navigator.camera.PictureSourceType;
         destinationType = navigator.camera.DestinationType;
-        //intel.xdk.device.setRotateOrientation('portrait');
-        //window.StatusBar.show();
         db = openDatabase("local.db", '1.0', "LocalDB", 4 * 1024 * 1024);
         /*db.transaction(function (tx) {
             tx.executeSql("DROP TABLE localUsers");
@@ -108,7 +109,8 @@ document.addEventListener('deviceready', function() {
             }
         });
         checkIfOnline();
-        var timer=window.setInterval(checkIfOnline,5000);
+        window.setInterval(checkIfOnline,10000);
+        $('#all').spin(false);
         window.StatusBar.overlaysWebView(false);
         window.StatusBar.backgroundColorByHexString('#000000');
     }
