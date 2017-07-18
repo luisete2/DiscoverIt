@@ -10,7 +10,7 @@
             $filtro["nombre"] = new MongoRegex('/'.$_REQUEST['name'].'/i');
         }
         if (!empty($_REQUEST['city'])) {
-            $filtro["city"] = $_REQUEST['city'];
+            $filtro["city"] = new MongoRegex('/'.$_REQUEST['city'].'/i');
         }
         if (!empty($_REQUEST['rank'])) {
             if($_REQUEST['rank']=='high'){
@@ -21,7 +21,7 @@
                 $filtro['valoracion']=['$lte'=> 2, '$gte'=> 0];
             }
         }
-        $table      = $collection->find($filtro)->sort(array('valoracion' => -1))->limit(25);
+        $table      = $collection->find($filtro)->sort(array('valoracion' => -1));
         //print_r($filtro);
     }else{
         $table     = $collection->find()->sort(array('valoracion' => -1))->limit(25);

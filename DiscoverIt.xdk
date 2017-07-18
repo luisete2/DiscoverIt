@@ -5,7 +5,7 @@
       "projectTypeName": "com.intel.xdk.projecttype.jsapp",
       "src": "jsapp/template-tab-view-js/sample.zip",
       "projectGuid": "e18b9935-82b9-48e7-9693-b9c1f69b86d1",
-      "lastModifiedDate": 1498845043924,
+      "lastModifiedDate": 1500026348949,
       "creationDate": 1488386673163
     },
     "sourceDirectory": "www",
@@ -75,7 +75,8 @@
         "gitref": "",
         "name": "Splashscreen",
         "description": "Cordova Splashscreen Plugin",
-        "checksum": "47137083"
+        "checksum": "47137083",
+        "cordovaVersion": ">=6.0.0"
       },
       {
         "id": "cordova-plugin-camera",
@@ -144,7 +145,8 @@
         },
         "description": "Cordova Geolocation Plugin",
         "data": {},
-        "dependedBy": []
+        "dependedBy": [],
+        "cordovaVersion": ">=6.0.0"
       },
       {
         "id": "cordova-plugin-vibration",
@@ -191,7 +193,8 @@
         },
         "description": "Cordova File Plugin",
         "data": {},
-        "dependedBy": []
+        "dependedBy": [],
+        "cordovaVersion": ">=6.0.0"
       },
       {
         "id": "com-badrit-base64",
@@ -234,6 +237,30 @@
         "data": {},
         "dependedBy": [],
         "custom": "true"
+      },
+      {
+        "id": "cordova-plugin-email-composer",
+        "name": "EmailComposer",
+        "version": "0.8.7",
+        "originType": "cordova.io",
+        "origin": "cordova-plugin-email-composer",
+        "gitref": "",
+        "paramvals": {},
+        "sourceLocation": "plugins/cordova-plugin-email-composer",
+        "selectedState": "Included",
+        "checksum": "30cbd76e",
+        "dependsOn": [],
+        "topLevel": true,
+        "cordovaVersion": ">=6.0.0",
+        "author": "Sebastián Katzer",
+        "permissions": {
+          "android:name": [
+            "android.permission.GET_ACCOUNTS"
+          ]
+        },
+        "description": "\n        Provides access to the standard interface that manages\n        the editing and sending an email message\n    ",
+        "data": {},
+        "dependedBy": []
       }
     ],
     "serviceMethods": [],
@@ -271,7 +298,32 @@
           "navigation": [],
           "properties": {}
         },
-        "icons_": [],
+        "icons_": [
+          {
+            "density": "hdpi",
+            "relPath": "package-assets/72x72 3.png",
+            "width": 72,
+            "height": 72
+          },
+          {
+            "density": "ldpi",
+            "relPath": "package-assets/36x36 2.png",
+            "width": 36,
+            "height": 36
+          },
+          {
+            "density": "mdpi",
+            "relPath": "package-assets/48x48 2.png",
+            "width": 48,
+            "height": 48
+          },
+          {
+            "density": "xhdpi",
+            "relPath": "package-assets/96x96 3.png",
+            "width": 96,
+            "height": 96
+          }
+        ],
         "splashes_": [],
         "addlPermissions_": "",
         "excludedLibraries_": "",
@@ -314,7 +366,13 @@
           "navigation": [],
           "properties": {}
         },
-        "icons_": [],
+        "icons_": [
+          {
+            "relPath": "package-assets/72x72 3.png",
+            "width": 72,
+            "height": 72
+          }
+        ],
         "splashes_": [],
         "addlPermissions_": "",
         "excludedLibraries_": "",
