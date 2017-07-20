@@ -130,8 +130,8 @@ var iconPin = {
     anchor: new google.maps.Point(25, 50),
     scaledSize: new google.maps.Size(50, 50)
 };
-//var url='http://192.168.0.109/DiscoverIt/www/php/';
-var url='http://esp.uem.es:8000/descubrelo/';
+var url='http://192.168.1.115/DiscoverIt/www/php/';
+//var url='http://esp.uem.es:8000/descubrelo/';
 google.maps.event.addDomListener(window, "load", initMap);
 google.maps.event.addDomListener(window, "load", initRouteMap);
 var db, events=[], map, routeMap, marker, mousedUp = false, service, directionsDisplay, typeQuery=0, request, rutasBajadas=[], autor, rutasValoradas=[];
@@ -1189,7 +1189,7 @@ function testConnection() {
     jQuery.ajaxSetup({async:false});
     re="";
     r=Math.round(Math.random() * 10000);
-    $.get("http://esp.uem.es/descubrelo/test.jpg",{subins:r},function(d){
+    $.get("http://pinturasxix.com/Imagenes/Suecia/1034/1.jpg",{subins:r},function(d){
         re=true;
     }).error(function(){
         re=false;

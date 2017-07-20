@@ -20,8 +20,8 @@ document.addEventListener('deviceready', function() {
 $.fn.spin.presets.loading = {
     lines: 15, length: 41, width: 14, radius: 42, scale: 0.75, corners: 1, color: '#000', opacity: 0.25, rotate: 0, direction: 1, speed: 1, trail: 60, fps: 20, zIndex: 2e9, className: 'spinner', top: '50%', left: '50%', shadow: true, hwaccel: false, position: 'absolute'
 };
-//var url='http://192.168.1.43/DiscoverIt/www/php/';
-var url='http://esp.uem.es:8000/descubrelo/';
+var url='http://192.168.1.115/DiscoverIt/www/php/';
+//var url='http://esp.uem.es:8000/descubrelo/';
 function confirmRegistry() {
     if(document.getElementById('username').value){
         if(!document.getElementById('password').value){
@@ -109,7 +109,7 @@ function testConnection() {
     jQuery.ajaxSetup({async:false});
     re="";
     r=Math.round(Math.random() * 10000);
-    $.get("http://esp.uem.es/descubrelo/test.jpg",{subins:r},function(d){
+    $.get("http://pinturasxix.com/Imagenes/Suecia/1034/1.jpg",{subins:r},function(d){
         re=true;
     }).error(function(){
         re=false;
