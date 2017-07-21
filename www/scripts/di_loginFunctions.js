@@ -1,18 +1,15 @@
 document.addEventListener('deviceready', function() {
-    if(getCookie('username')!=null){
-        window.alert('¡Bienvenido, '+getCookie('username')+'!');
+    if(localStorage.getItem('username')!==null){
+        window.alert('¡Bienvenido, '+localStorage.getItem('username')+'!');
         window.location.replace("main.html");
     }else{
         $.base64.utf8encode = true;
         checkIfOnline();
         db = openDatabase("local.db", '1.0', "LocalDB", 2 * 1024 * 1024);
-        /*db.transaction(function (tx) {
-            tx.executeSql("DROP TABLE localUsers");
-        });*/
         db.transaction(function (tx) {
             tx.executeSql("CREATE TABLE IF NOT EXISTS localUsers (nick text primary key, pass text)");
         });
-        var timer=window.setInterval(checkIfOnline,5000);
+        //var timer=window.setInterval(checkIfOnline,5000);
         window.StatusBar.overlaysWebView(false);
         window.StatusBar.backgroundColorByHexString('#000000');
     }
@@ -35,9 +32,8 @@ function confirmRegistry() {
                 password: document.getElementById('password').value,
                 confirmarRegistro: true
             }, function(data, status) {
-                console.log(data);
                 if(data=='Usuario existente'){
-                    window.alert('Ya existe un usuario con ese nombre. Por favor, introduce otro nombre o inicia sesión si eres este usuario.')
+                    window.alert('Ya existe un usuario con ese nombre. Por favor, introduce otro nombre o inicia sesión si eres este usuario.');
                 }else if(data=="Registro exitoso"){
                     var encodedPass = $.base64.encode(document.getElementById('password').value, true);
                     db.transaction(function (tx) {
@@ -54,7 +50,7 @@ function confirmRegistry() {
     }else{
         window.alert('Introduce un nombre de usuario, por favor');
     }
-};
+}
 function confirmLogin () {
     if(!document.getElementById('log-password').value){
         window.alert('Introduce la contraseña, por favor');
@@ -66,14 +62,14 @@ function confirmLogin () {
                     var decodedPass = $.base64.decode(results.rows.item(0).pass, true);
                     if(decodedPass==document.getElementById('log-password').value){
                         window.alert('¡Login realizado con éxito!');
-                        document.cookie = "username="+document.getElementById('log-uname').value+"; path=/";
+                        localStorage.setItem('username', document.getElementById('log-uname').value);
                         window.location.replace("main.html");
                     }else{
                         window.alert('Contraseña errónea. Por favor, introducela de nuevo.');
                     }
                     $('#loginPage').spin(false);
                 }else{
-                    if(testConnection()==false){
+                    if(testConnection()===false){
                         window.alert('Lo sentimos, ese nombre no esta en la base de datos local. Conéctate a internet para comprobarlo con la base online.');
                         $('#loginPage').spin(false);
                     }else{
@@ -82,10 +78,9 @@ function confirmLogin () {
                             password: document.getElementById('log-password').value,
                             iniciarSesion: true
                         }, function(data, status) {
-                            console.log(data);
                             if(data=="Login exitoso"){
                                 tx.executeSql("INSERT INTO localUsers (nick, pass) VALUES (?,?)", [document.getElementById('log-uname').value, $.base64.encode(document.getElementById('log-password').value, true)]);
-                                document.cookie = "username="+document.getElementById('log-uname').value+"; path=/";
+                                localStorage.setItem('username', document.getElementById('log-uname').value);
                                 window.alert('¡Login realizado con éxito!');
                                 window.location.replace("main.html");
                             }else if(data=="Login fallido"){
@@ -100,16 +95,16 @@ function confirmLogin () {
             });
         });
     }
-};
+}
 function emailAddressIsValid(email) {
     var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
     return re.test(email);
-};
+}
 function testConnection() {
     jQuery.ajaxSetup({async:false});
     re="";
     r=Math.round(Math.random() * 10000);
-    $.get("http://pinturasxix.com/Imagenes/Suecia/1034/1.jpg",{subins:r},function(d){
+    $.get("http://192.168.1.115/DiscoverIt/www/test.jpg",{subins:r},function(d){
         re=true;
     }).error(function(){
         re=false;
@@ -117,7 +112,7 @@ function testConnection() {
     return re;
 }
 function checkIfOnline(){
-    if(testConnection()==false){
+    if(testConnection()===false){
         if (window.location.href.indexOf("signUpPage") > -1 ) {
             window.alert('Se ha perdido la conexión a internet. Por favor, conecta el dispositivo de nuevo para realizar el registro.');
             $.mobile.changePage( "#landingPage");
@@ -127,19 +122,3 @@ function checkIfOnline(){
         $("#toSignUp").button().button('enable'); 
     }
 }
-function getCookie(name) {
-    var dc = document.cookie;
-    var prefix = name + "=";
-    var begin = dc.indexOf("; " + prefix);
-    if (begin == -1) {
-        begin = dc.indexOf(prefix);
-        if (begin != 0) return null;
-    }else{
-        begin += 2;
-        var end = document.cookie.indexOf(";", begin);
-        if (end == -1) {
-        end = dc.length;
-        }
-    }
-    return decodeURI(dc.substring(begin + prefix.length, end));
-} 

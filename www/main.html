@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html>
+<html class="ui-mobile">
     <head>
         <title>DiscoverIt - Una nueva forma de viajar</title>
         <meta content="text/html; charset=utf-8" http-equiv="Content-type">
-        <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=0, minimal-ui" name="viewport">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=0">
         <link href="lib/appframework/icons.css" rel="stylesheet" type="text/css"/>
         <link href="lib/appframework/af.ui.css" rel="stylesheet" type="text/css"/>
         <link href="css/jquery-ui.css" rel="stylesheet"/>
@@ -27,7 +27,7 @@
         <script src='lib/fullcalendar.js'></script>
         <script src='lib/fastclick.min.js'></script>
     </head>
-    <body id="all">
+    <body id="all" class="ui-mobile-viewport ui-overlay-c">
         <div data-role="page" id="mapPage" data-theme="d">
             <div data-role="content" style="padding:0">
                 <div id="mapa_div"></div>
@@ -112,7 +112,7 @@
                 <a data-rel="back" data-icon="carat-l">Volver</a>
                 <h1>Ciudades</h1>
             </div> 
-            <div data-role="content" style="padding:0">
+            <div data-role="content" style="padding:0;">
                 <div class="ui-collapsible-set" id="cityInfoCollapsible"></div>
             </div>
         </div>
@@ -136,6 +136,7 @@
                 <!--<button data-role="button" onclick="sendEmail()">Contacto</button>-->
                 <a data-role="button" href="#myRoutesPage">Mis rutas</a>
                 <button data-role="button" onclick="logOut()">Cerrar sesión</button>
+                <button data-role="button" onclick="checkIfOnline()">Comprobar conexión</button>
             </div>
         </div>
         <div data-role="page" id="myRoutesPage" data-theme="d">
@@ -291,8 +292,8 @@
                 <button id="searchRCButton" onclick="searchRCPlace()"><i class="fa fa-search fa-lg"></i> Mostrar en el mapa</button>
             </div>
         </div>
-        <div data-role="footer" data-position="fixed" data-tap-toggle="false" id="mainNav">
-            <div data-role="navbar" style="padding:0; !important;">
+        <div data-role="footer" data-position="fixed" data-tap-toggle="false" id="mainNav" style="height:9.5%">
+            <div data-role="navbar">
                 <ul style="padding:0 !important;">
                     <li><a href="#mapPage" data-ajax="false">
                         <i aria-hidden="true" class="fa fa-map fa-2x"></i>

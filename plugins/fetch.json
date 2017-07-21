@@ -66,15 +66,6 @@
         "is_top_level": true,
         "variables": {}
     },
-    "com-badrit-base64": {
-        "source": {
-            "type": "git",
-            "url": "https://github.com/hazemhagrass/phonegap-base64",
-            "subdir": "."
-        },
-        "is_top_level": true,
-        "variables": {}
-    },
     "cordova-plugin-whitelist": {
         "source": {
             "type": "local",
@@ -96,6 +87,14 @@
         "source": {
             "type": "registry",
             "id": "cordova-plugin-email-composer"
+        },
+        "is_top_level": true,
+        "variables": {}
+    },
+    "com-badrit-base64": {
+        "source": {
+            "type": "registry",
+            "id": "com-badrit-base64"
         },
         "is_top_level": true,
         "variables": {}

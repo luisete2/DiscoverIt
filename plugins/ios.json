@@ -30,13 +30,13 @@
         "cordova-plugin-file": {
             "PACKAGE_NAME": "io.cordova.hellocordova"
         },
-        "com-badrit-base64": {
-            "PACKAGE_NAME": "io.cordova.hellocordova"
-        },
         "cordova-plugin-whitelist": {
             "PACKAGE_NAME": "io.cordova.hellocordova"
         },
         "cordova-plugin-email-composer": {
+            "PACKAGE_NAME": "io.cordova.hellocordova"
+        },
+        "com-badrit-base64": {
             "PACKAGE_NAME": "io.cordova.hellocordova"
         }
     },

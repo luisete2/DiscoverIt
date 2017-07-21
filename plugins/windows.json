@@ -28,13 +28,13 @@
         "cordova-plugin-file": {
             "PACKAGE_NAME": "HelloCordova"
         },
-        "com-badrit-base64": {
-            "PACKAGE_NAME": "HelloCordova"
-        },
         "cordova-plugin-whitelist": {
             "PACKAGE_NAME": "HelloCordova"
         },
         "cordova-plugin-email-composer": {
+            "PACKAGE_NAME": "HelloCordova"
+        },
+        "com-badrit-base64": {
             "PACKAGE_NAME": "HelloCordova"
         }
     },

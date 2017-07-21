@@ -40,7 +40,7 @@
 <plugin name="buildfire-cordova-plugin-calendar" spec="4.4.4"/>
 <plugin name="com-badrit-base64" spec="https://github.com/hazemhagrass/phonegap-base64"/> <!-- If available via Cordova registry; consider changing to an NPM reference. -->
 <plugin name="cordova-plugin-whitelist" spec="1.2.2"/>
-<plugin name="cordova-plugin-indexeddb-async" spec="0.0.1"/>
+
 <plugin name="cordova-plugin-websql-async" spec="https://github.com/Thinkwise/cordova-plugin-websql.git"/> <!-- If available via Cordova registry; consider changing to an NPM reference. -->
 <platform  name="ios">
     <!-- below requires the splash screen plugin -->
