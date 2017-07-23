@@ -6,7 +6,9 @@ function sacarWiki($url){
     $seciones=[];
     array_shift($seciones);
 	$posH2=-5;
-    $seciones['Intro']=sacarIntro($pagina);
+    $intro=sacarIntro($pagina);
+    //if($intro!=='<p><br \>\n') 
+    $seciones['Intro']=$intro;
 	do{
         $findme='<h2';
         $posH2 = strpos($pagina, $findme,$posH2+5);
@@ -14,8 +16,7 @@ function sacarWiki($url){
             $array[]=$posH2;	
         }
     }while($posH2);
-    array_shift($array);
-    $ContSeciones=count($array)-2;
+    $ContSeciones=count($array)-1;
     if(isset($array)){
         for ($i=0; $i <$ContSeciones ; $i++) { 
             $findme='</h2>';
@@ -32,12 +33,26 @@ function sacarWiki($url){
             }
         }
     }
-    
+    if(array_key_exists('Índice', $array)){
+        $array['Índice'] = $value;
+    }else{
+        unset($array['Índice']);
+    };
     if(!empty($seciones)){
         return $seciones;
     }else{
         return 'Vacia';
     }
+}
+function sacarIntro($pagina){
+    $findme='<p>';
+	$posIntro = strpos($pagina, $findme,0);
+	$findme2='</p>';
+	$posIntroF = strpos($pagina, $findme2,0);
+	$posIntroR=$posIntroF-$posIntro;
+	$intro=substr($pagina, $posIntro,$posIntroR);
+	$intro=quitar_enlaces($intro);
+	return $intro;
 }
 function sacar_id($entrada, $language){
     $entrada=str_replace(" ", "_", $entrada);
@@ -105,16 +120,6 @@ function quitar_enlaces($texto){
     $texto=strip_tags($texto,'<p><br><b><img><div><ul><li>');
 	$texto = preg_replace('/\[([1-9][0-9]*)\]/', "", $texto);
 	return $texto;
-}
-function sacarIntro($pagina){
-    $findme='<p>';
-	$posIntro = strpos($pagina, $findme,0);
-	$findme2='</p>';
-	$posIntroF = strpos($pagina, $findme2,0);
-	$posIntroR=$posIntroF-$posIntro;
-	$intro=substr($pagina, $posIntro,$posIntroR);
-	$intro=quitar_enlaces($intro);
-	return $intro;
 }
 function fetchItem($item){
     $result=[];

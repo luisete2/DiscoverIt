@@ -48,5 +48,8 @@
     "successDeleteUser": "Cuenta borrada con exito. ¡Esperamos volver a verte pronto!",
     "connectionLostRC": "Se ha perdido la conexión a internet. Por favor, conecta el dispositivo de nuevo para completar la ruta.",
     "connectionLostRCS": "Se ha perdido la conexión a internet. Por favor, conecta el dispositivo de nuevo para realizar la búsqueda.",
-    "noInfoFound": "No se ha encontrado información de este lugar."
+    "noInfoFound": "No se ha encontrado información de este lugar.",
+    "pleaseEnableGeoloc": "Por favor, habilita la geolocalización para realizar una búsqueda por cercanía.",
+    "seeMoreInfo": "Pulsa i para ver mas información.",
+    "index": "Índice"
 }

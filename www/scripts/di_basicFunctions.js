@@ -20,7 +20,7 @@ document.addEventListener('deviceready', function() {
         window.alert(dictionary.pleaseLogin);
         window.location.replace("index.html");
     }else{
-        if(testConnection()===true){
+        if(testConnection()==true){
             $.post(url+'di_getValuedRoutes.php', {
                 autor: localStorage.getItem('username')
             }, function(data, status) {
@@ -53,10 +53,11 @@ document.addEventListener('deviceready', function() {
                                     autor: element.autor
                                 };
                                 tx.executeSql("INSERT INTO localMyRoutes (id, route) VALUES (?,?)", [element._id.$id, JSON.stringify(ruta)]);
-                            }
+                            } 
                         });
                     });            
                 });
+                
             });
         }
         db.transaction(function (tx) {
@@ -72,8 +73,10 @@ document.addEventListener('deviceready', function() {
                 }
                 if(testConnection()==true){
                     getRoutes();
+                    initializeGoogle();
                 }else{
                     $('#routesCollapsible').append('<button id="reloadRoutes" onclick="getRoutes()" style="padding:0;margin:0;">'+dictionary.reloadRoutes+'</button>');
+                    $('#reloadRoutes').button();
                 };
             });
             tx.executeSql("SELECT * FROM localEvents", [], function(tx, results) {
@@ -90,8 +93,6 @@ document.addEventListener('deviceready', function() {
                 }
             });
         });
-        initMap();
-        initRouteMap();
         loadMyRoutes();
         loadDownloadedRoutes();
         autor=localStorage.getItem('username');
@@ -139,35 +140,40 @@ $('#confirmRoute').addClass('ui-state-disabled');
 $.fn.spin.presets.loading = {
     lines: 15, length: 41, width: 14, radius: 42, scale: 0.75, corners: 1, color: '#000', opacity: 0.25, rotate: 0, direction: 1, speed: 1, trail: 60, fps: 20, zIndex: 2e9, className: 'spinner', top: '50%', left: '50%', shadow: true, hwaccel: false, position: 'absolute'
 };
-var iconPin = {
-    url: "location_marker.svg",
-    anchor: new google.maps.Point(25, 50),
-    scaledSize: new google.maps.Size(50, 50)
-};
 var url='http://192.168.1.110/DiscoverIt/www/php/';
 //var url='http://esp.uem.es:8000/descubrelo/';
 var db, events=[], map, routeMap, marker, mousedUp = false, service, directionsDisplay, typeQuery=0, request, rutasBajadas=[], autor, rutasValoradas=[], navBar;
 var language = window.navigator.language.substring(0, 2), dictionary;
-var geocoder = new google.maps.Geocoder(), GeoMarker = new GeolocationMarker();
-var routesArray = [], infoWindow= new google.maps.InfoWindow();
-var rDirectionsService = new google.maps.DirectionsService();
-var autocomplete =  new google.maps.places.Autocomplete(document.getElementById('B1City'),{types: ['(cities)']});
-var autocompleteRC =  new google.maps.places.Autocomplete(document.getElementById('RCCity'),{types: ['(cities)']});
-var autocompleteRS =  new google.maps.places.Autocomplete(document.getElementById('RCity'),{types: ['(cities)']});
-var autocompleteRCS =  new google.maps.places.Autocomplete(document.getElementById('cityName'),{types: ['(cities)']});
+var geocoder, rDirectionsService, autocomplete, autocompleteRC, autocompleteRS, autocompleteRCS, routesArray = [], infoWindow, GeoMarker, googInit=false;
+function initializeGoogle(){
+    if(googInit==false){
+        geocoder = new google.maps.Geocoder();
+        GeoMarker = new GeolocationMarker();
+        infoWindow= new google.maps.InfoWindow();
+        rDirectionsService = new google.maps.DirectionsService();
+        autocomplete =  new google.maps.places.Autocomplete(document.getElementById('B1City'),{types: ['(cities)']});
+        autocompleteRC =  new google.maps.places.Autocomplete(document.getElementById('RCCity'),{types: ['(cities)']});
+        autocompleteRS =  new google.maps.places.Autocomplete(document.getElementById('RCity'),{types: ['(cities)']});
+        autocompleteRCS =  new google.maps.places.Autocomplete(document.getElementById('cityName'),{types: ['(cities)']});
+        google.maps.event.addListener(autocomplete, 'place_changed', function(){
+            var place = autocomplete.getPlace();
+        });
+        google.maps.event.addListener(autocompleteRC, 'place_changed', function(){
+            var place = autocompleteRC.getPlace();
+        });
+        google.maps.event.addListener(autocompleteRS, 'place_changed', function(){
+            var place = autocompleteRS.getPlace();
+        });
+        google.maps.event.addListener(autocompleteRCS, 'place_changed', function(){
+            var place = autocompleteRCS.getPlace();
+        });
+        initMap();
+        initRouteMap();
+        googInit=true;
+    }
+}
 var rOrigin = null, rDestination = null, rWaypoints = [], markerArray = [], rDirectionsDisplay, rMarkerArray=[], bMarkerArray=[], rMarkerInfo=[];
-google.maps.event.addListener(autocomplete, 'place_changed', function(){
-    var place = autocomplete.getPlace();
-});
-google.maps.event.addListener(autocompleteRC, 'place_changed', function(){
-    var place = autocompleteRC.getPlace();
-});
-google.maps.event.addListener(autocompleteRS, 'place_changed', function(){
-    var place = autocompleteRS.getPlace();
-});
-google.maps.event.addListener(autocompleteRCS, 'place_changed', function(){
-    var place = autocompleteRCS.getPlace();
-});
+
 //SECCIÓN MAPA
 //Mapa de pagina principal
 function initMap() {
@@ -279,31 +285,30 @@ function initMap() {
     });
     service = new google.maps.places.PlacesService(map);
     directionsDisplay = new google.maps.DirectionsRenderer({map: map});
-    if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(function(position) {
-            var pos = {
-                lat: position.coords.latitude,
-                lng: position.coords.longitude
-            };
-            map.panTo(pos);
-            GeoMarker.setCircleOptions({
-                fillColor: '#808080'
-            });
-            google.maps.event.addListenerOnce(GeoMarker, 'position_changed', function() {
-                map.panTo(this.getPosition());
-                map.fitBounds(this.getBounds());
-            });
-            google.maps.event.addListener(GeoMarker, 'geolocation_error', function(e) {
-                window.alert('There was an error obtaining your position. Message: ' + e.message);
-            });
-            GeoMarker.setMap(map);
-        }, function() {
-            handleLocationError(true, infoWindow, map.getCenter());
+    navigator.geolocation.getCurrentPosition(function(position) {
+        var pos = {
+            lat: position.coords.latitude,
+            lng: position.coords.longitude
+        };
+        map.panTo(pos);
+        GeoMarker.setCircleOptions({
+            fillColor: '#808080'
         });
-    } else {
-        // Browser doesn't support Geolocation
-        handleLocationError(false, infoWindow, map.getCenter());
-    }
+        google.maps.event.addListenerOnce(GeoMarker, 'position_changed', function() {
+            map.panTo(this.getPosition());
+            map.fitBounds(this.getBounds());
+        });
+        google.maps.event.addListener(GeoMarker, 'geolocation_error', function(e) {
+            window.alert('There was an error obtaining your position. Message: ' + e.message);
+        });
+        GeoMarker.setMap(map);
+    }, function() {
+        $('#locationIcon').hide();
+        handleLocationError(true, infoWindow, map.getCenter());
+    });
+    $('#mapPage').bind('pageshow', function() {
+        google.maps.event.trigger(map, "resize");
+    });
     $('#mapPage').spin(false);
 }
 //Mapa de crear ruta
@@ -490,7 +495,9 @@ function searchPlace() {
                                 });
                                 var image="";
                                 if(typeof k.img !== 'undefined'){
-                                    image='<img src='+k.img+' width="100%" height="100%">';
+                                    image='<img src='+k.img+'>';
+                                }else{
+                                    image='<br>';
                                 };
                                 marker.addListener('click', function() {
                                     infoWindow.setContent("<div id='content'><div id='siteNotice'></div><h2>"+k.title+"</h2>"+image+"<div id='bodyContent'><p>"+k.summary+"</p></div><i id='iP"+contador+"' class='fa fa-info-circle fa-2x' style='text-align:right;' aria-hidden='true'></i></div>");           
@@ -509,6 +516,7 @@ function searchPlace() {
                         }else{
                             window.alert(dictionary.noResultsFound);
                         }
+                        google.maps.event.trigger(map, "resize");
                         $('#searchPage').spin(false);
                     });
                 } else {
@@ -518,53 +526,61 @@ function searchPlace() {
             });
         }
     } else if (typeQuery == 2){
-        var userPos = GeoMarker.getPosition();
-        //CODIGO PARA BUSQUEDAS POR CERCANIA
-        $.post(url+'di_placeQuerys.php', {
-            tipoQuery: typeQuery,
-            radio: document.getElementById('B2In').value,
-            lat: userPos.lat,
-            lng: userPos.lng,
-            language: language
-        }, function(data, status) {
-            var mdata = JSON.parse(data);
-            if(mdata!=="Vacia"){
-                cleanMap();
-                $.mobile.changePage( "#mapPage");
-                $("#mainNav").show();
-                map.panTo(GeoMarker.getPosition());
-                var contador=0;
-                mdata.forEach(function(k) {
-                    var marker = new google.maps.Marker({
-                        position: {
-                            lat: k.lat,
-                            lng: k.lng
-                        },
-                        map: map
-                    });
-                    var image="";
-                    if(typeof k.img !== 'undefined'){
-                        image='<img src='+k.img+' width="100%" height="100%">';
-                    };
-                    marker.addListener('click', function() {
-                        infoWindow.setContent("<div id='content'><div id='siteNotice'></div><h2>"+k.title+"</h2>"+image+"<div id='bodyContent'><p>"+k.summary+"</p></div><i id='iP"+contador+"' class='fa fa-info-circle fa-2x' style='text-align:right;' aria-hidden='true'></i></div>");           
-                        infoWindow.open(map, this);
-                        $('#iP'+contador).click(function() {
-                            navBar='#mainNav';
-                            getInfoPlace(k.title);
+        if (GeoMarker.getPosition()!==null) {
+            var userPos = GeoMarker.getPosition();
+            //CODIGO PARA BUSQUEDAS POR CERCANIA
+            $.post(url+'di_placeQuerys.php', {
+                tipoQuery: typeQuery,
+                radio: document.getElementById('B2In').value,
+                lat: userPos.lat,
+                lng: userPos.lng,
+                language: language
+            }, function(data, status) {
+                var mdata = JSON.parse(data);
+                if(mdata!=="Vacia"){
+                    cleanMap();
+                    $.mobile.changePage( "#mapPage");
+                    $("#mainNav").show();
+                    map.panTo(GeoMarker.getPosition());
+                    var contador=0;
+                    mdata.forEach(function(k) {
+                        var marker = new google.maps.Marker({
+                            position: {
+                                lat: k.lat,
+                                lng: k.lng
+                            },
+                            map: map
                         });
+                        var image="";
+                        if(typeof k.img !== 'undefined'){
+                            image='<img src='+k.img+'>';
+                        }else{
+                            image='<br>';
+                        };
+                        marker.addListener('click', function() {
+                            infoWindow.setContent("<div id='content'><div id='siteNotice'></div><h2>"+k.title+"</h2>"+image+"<div id='bodyContent'><p>"+k.summary+"</p></div><i id='iP"+contador+"' class='fa fa-info-circle fa-2x' style='text-align:right;' aria-hidden='true'></i></div>");           
+                            infoWindow.open(map, this);
+                            $('#iP'+contador).click(function() {
+                                navBar='#mainNav';
+                                getInfoPlace(k.title);
+                            });
+                        });
+                        markerArray.push(marker);
+                        contador++;
                     });
-                    markerArray.push(marker);
-                    contador++;
-                });
-                directionsDisplay.setDirections({routes: []});
-                document.getElementById('cleanRouteIcon').style.display = 'none';
-                document.getElementById('cleanMarkersIcon').style.display = 'inline';
-            }else{
-                window.alert(dictionary.noResultsFound);
-            }
+                    directionsDisplay.setDirections({routes: []});
+                    document.getElementById('cleanRouteIcon').style.display = 'none';
+                    document.getElementById('cleanMarkersIcon').style.display = 'inline';
+                }else{
+                    window.alert(dictionary.noResultsFound);
+                }
+                google.maps.event.trigger(map, "resize");
+                $('#searchPage').spin(false);
+            });
+        }else{
+            window.alert(dictionary.pleaseEnableGeoloc);
             $('#searchPage').spin(false);
-        });
+        }
     } else if (typeQuery == 3){
         if(!document.getElementById('B3City').value){
             window.alert(dictionary.pleaseInsertCity);
@@ -590,6 +606,7 @@ function searchPlace() {
                 }else{
                     window.alert(dictionary.noResultsFound);
                 } 
+                google.maps.event.trigger(map, "resize");
                 $('#searchPage').spin(false);
             });  
         }
@@ -602,6 +619,7 @@ function getInfoPlace(title){
         language: language,
         tipoQuery: 5
     }, function(data, status) {
+        console.log(data);
         var mdata = JSON.parse(data);
         if(mdata!=="Vacia"){
             $(navBar).hide();
@@ -618,7 +636,9 @@ function setInfoPage(data, page){
     $(page).empty();
         for (var k in data){
             if (data.hasOwnProperty(k)) {
-                $(page).append("<div data-role='collapsible' class='animateCollapsible' data-collapsed-icon='carat-d' data-expanded-icon='carat-u'><h3>"+k+"</h3>"+data[k]+"</div>").trigger('create');
+                if(k!=dictionary.index){
+                    $(page).append("<div data-role='collapsible' class='animateCollapsible' data-collapsed-icon='carat-d' data-expanded-icon='carat-u'><h3>"+k+"</h3>"+data[k]+"</div>").trigger('create');
+                }
             }
         }
 }
@@ -629,8 +649,8 @@ function handleLocationError(browserHasGeolocation, infoWindow, pos){
 $('#locationIcon').click(function(){
     navigator.geolocation.getCurrentPosition(function(position) {
         var pos = {
-            lat: position.coords.latitude,
-            lng: position.coords.longitude
+            lat: position.coords.latitude(),
+            lng: position.coords.longitude()
         };
         map.panTo(pos);
     });
@@ -639,6 +659,10 @@ $('#locationIcon').click(function(){
 function setRoute(routeId){
     $('#all').spin('loading');
     if(markerArray.length!==0) cleanMap();
+    var pos = {
+        lat: routesArray[routeId].gRoute.origin.lat,
+        lng: routesArray[routeId].gRoute.origin.lng
+    };
     var directionsService = new google.maps.DirectionsService();
     directionsService.route(routesArray[routeId].gRoute, function(response, status) {
         if (status == google.maps.DirectionsStatus.OK) {
@@ -648,7 +672,9 @@ function setRoute(routeId){
             reverse: true,
             changeHash: true
         });
+        map.panTo(pos);
     });
+    google.maps.event.trigger(map, "resize");
     $('#mainNav').show();
     document.getElementById('cleanRouteIcon').style.display = 'inline';
     $('#all').spin(false);
@@ -892,6 +918,7 @@ function saveRoute(){
             if(data.substring(0,7)=='SUCCESS'){
                 window.alert(dictionary.saveRouteSuccess);
                 $.mobile.changePage("#mapPage");
+                google.maps.event.trigger(map, "resize");
                 $("#mainNav").show();
                 resetRoute();
                 var idRuta=data.substring(12);
@@ -908,6 +935,9 @@ function saveRoute(){
                 });
                 loadMyRoutes();
                 getRoutes();
+                $("#routeName").val('');
+                $("#routeDesc").val('');
+                $("#cityName").val('');
             }else{
                 window.alert(dictionary.unexpectedFailure);
             }
@@ -954,8 +984,7 @@ function searchRCPlace() {
                 }
                 $.post(url+'di_placeQuerys.php', {
                     tipoQuery: 4,
-                    city: city,
-                    tipo: document.getElementById("RCType").value
+                    city: city
                 }, function(data, status) {
                     //window.alert(JSON.stringify(data, null, 4));
                     var mdata = JSON.parse(data);
@@ -973,16 +1002,20 @@ function searchRCPlace() {
                                 nombre: k.nombre,
                                 //animation: google.maps.Animation.DROP
                             });
+                            var image="";
+                            if(typeof k.img !== 'undefined'){
+                                image='<img src='+k.img+' width="100%" height="100%">';
+                            };
                             marker.addListener('click', function() {
-                                infoWindow.setContent("<div id='content'><div id='siteNotice'></div><h2>" + k.nombre + "</h2><div id='bodyContent'><p>Aqui va la info</p></div><i id='iW"+contador+"' class='fa fa-plus-circle fa-2x' style='text-align:right;' aria-hidden='true'></i><i id='iP"+contador+"' class='fa fa-info-circle fa-2x' style='text-align:right;' aria-hidden='true'></i></div>");           
+                                infoWindow.setContent("<div id='content'><div id='siteNotice'></div><h2>" + k.nombre + "</h2><div id='bodyContent'><p>"+dictionary.seeMoreInfo+"</p></div><i id='iW"+contador+"' class='fa fa-plus-circle fa-2x' style='text-align:right;' aria-hidden='true'></i><i id='iP"+contador+"' class='fa fa-info-circle fa-2x' style='text-align:right;' aria-hidden='true'></i></div>");           
                                 infoWindow.open(routeMap, this);
                                 $('#iW'+contador).click(function(){
                                     addMarker(marker);
                                     marker.setMap(null);
                                 });
                                 $('#iP'+contador).click(function() {
-                                    $.mobile.changePage("#infoPage"); 
-                                    $("#routeCreatorNav").hide();
+                                    navBar='#routeCreatorNav';
+                                    getInfoPlace(k.nombre);
                                 });
                             });       
                             bMarkerArray.push(marker);
@@ -1196,6 +1229,7 @@ function checkIfOnline(){
         if (window.location.href.indexOf("searchPage") > -1){
             window.alert(dictionary.lostConnectionRCS);
             $.mobile.changePage("#mapPage");
+            google.maps.event.trigger(map, "resize");
             $('#mainNav').show();
         }
         //$(".btn"+routeId).prop("disabled",true);
@@ -1251,9 +1285,9 @@ $('#searchPage, #routesPage, #cityInfoPage, #routeResultPage, #myRoutesPage, #in
 $('#routeCreatorPage').on("pageshow", function(event, ui) {
     google.maps.event.trigger(routeMap, "resize");
 });
-$("#mapPage").on("pageshow" , function() {
+/*$("#mapPage").on("pageshow" , function() {
     google.maps.event.trigger(map, "resize");
-});
+});*/
 $('#calendarPage').on("pageshow", function(event, ui) {
     $('#calendar').fullCalendar('render');
 });
