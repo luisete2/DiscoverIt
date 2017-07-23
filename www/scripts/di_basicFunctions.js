@@ -1,6 +1,13 @@
 /* jshint browser: true */
 //PRIMERA INICIALIZACION
 document.addEventListener('deviceready', function() {
+    $.getJSON('./languages/js-'+language+'.json', function(json) {
+        dictionary=json;
+    }).fail(function() { 
+        $.getJSON('./languages/js-en.json', function(json) {
+            dictionary=json;
+        });
+    });
     $('#all').spin('loading');
     var h = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
     $('#cityInfoCollapsible').height((90 / 100) * h);
@@ -8,8 +15,9 @@ document.addEventListener('deviceready', function() {
     $('#myRoutesCollapsible').height((90 / 100) * h);
     $('#routeResultCollapsible').height((90 / 100) * h);
     $('#favoriteRoutesCollapsible').height((80 / 100) * h);
+    $('#infoCollapsible').height((90 / 100) * h);
     if(localStorage.getItem('username')===null){
-        window.alert('Por favor, inicia sesión para acceder al contenido.');
+        window.alert(dictionary.pleaseLogin);
         window.location.replace("index.html");
     }else{
         if(testConnection()===true){
@@ -31,7 +39,6 @@ document.addEventListener('deviceready', function() {
             $.post(url+'di_loadUserRoutes.php', {
                 autor: localStorage.getItem('username')
             }, function(data, status) {
-                //console.log(data);
                 var mdata=JSON.parse(data);
                 mdata.forEach(function(element){
                     db.transaction(function (tx) {
@@ -66,7 +73,7 @@ document.addEventListener('deviceready', function() {
                 if(testConnection()==true){
                     getRoutes();
                 }else{
-                    $('#routesCollapsible').append('<button id="reloadRoutes" onclick="getRoutes()" style="padding:0;margin:0;">Recargar rutas</button>');
+                    $('#routesCollapsible').append('<button id="reloadRoutes" onclick="getRoutes()" style="padding:0;margin:0;">'+dictionary.reloadRoutes+'</button>');
                 };
             });
             tx.executeSql("SELECT * FROM localEvents", [], function(tx, results) {
@@ -83,6 +90,8 @@ document.addEventListener('deviceready', function() {
                 }
             });
         });
+        initMap();
+        initRouteMap();
         loadMyRoutes();
         loadDownloadedRoutes();
         autor=localStorage.getItem('username');
@@ -119,6 +128,7 @@ document.addEventListener('deviceready', function() {
         checkIfOnline();
         //window.setInterval(checkIfOnline,10000);
         $('#all').spin(false);
+        $("[data-localize]").localize("lang", {pathPrefix: "languages", skipLanguage: ["es","es-ES"]});
         window.StatusBar.overlaysWebView(false);
         window.StatusBar.backgroundColorByHexString('#000000');
     }
@@ -134,11 +144,10 @@ var iconPin = {
     anchor: new google.maps.Point(25, 50),
     scaledSize: new google.maps.Size(50, 50)
 };
-var url='http://192.168.1.115/DiscoverIt/www/php/';
+var url='http://192.168.1.110/DiscoverIt/www/php/';
 //var url='http://esp.uem.es:8000/descubrelo/';
-google.maps.event.addDomListener(window, "load", initMap);
-google.maps.event.addDomListener(window, "load", initRouteMap);
-var db, events=[], map, routeMap, marker, mousedUp = false, service, directionsDisplay, typeQuery=0, request, rutasBajadas=[], autor, rutasValoradas=[];
+var db, events=[], map, routeMap, marker, mousedUp = false, service, directionsDisplay, typeQuery=0, request, rutasBajadas=[], autor, rutasValoradas=[], navBar;
+var language = window.navigator.language.substring(0, 2), dictionary;
 var geocoder = new google.maps.Geocoder(), GeoMarker = new GeolocationMarker();
 var routesArray = [], infoWindow= new google.maps.InfoWindow();
 var rDirectionsService = new google.maps.DirectionsService();
@@ -161,7 +170,6 @@ google.maps.event.addListener(autocompleteRCS, 'place_changed', function(){
 });
 //SECCIÓN MAPA
 //Mapa de pagina principal
-google.maps.visualRefresh = true;
 function initMap() {
     $('#mapPage').spin('loading');
     map = new google.maps.Map(document.getElementById('mapa_div'), {
@@ -448,15 +456,12 @@ function initRouteMap() {
 function searchPlace() {
     $('#searchPage').spin('loading');
     if (typeQuery === 0) {
-        window.alert('Por favor, selecciona un tipo de búsqueda.');
+        window.alert(dictionary.pleaseSelectSearchType);
         $('#searchPage').spin(false);
     } else if (typeQuery == 1) {
         //CODIGO PARA BUSQUEDAS COMPLEJAS
-        if(!document.getElementById('B1Query').value){
-            window.alert('Por favor, inserta un tipo para realizar la busqueda.');
-            $('#searchPage').spin(false);
-        }else if(!document.getElementById('B1City').value){
-            window.alert('Por favor, inserta una ciudad para realizar la busqueda.');
+        if(!document.getElementById('B1City').value){
+            window.alert(dictionary.pleaseInsertCity);
             $('#searchPage').spin(false);
         }else{
             geocoder.geocode({'address': document.getElementById('B1City').value}, function(results, status) {
@@ -465,29 +470,35 @@ function searchPlace() {
                         tipoQuery: typeQuery,
                         lat: results[0].geometry.location.lat,
                         lng: results[0].geometry.location.lng,
-                        query: document.getElementById("B1Query").options[document.getElementById("B1Query").selectedIndex].value
+                        radio: 5000,
+                        language: language
                     }, function(data, status) {
                         var mdata = JSON.parse(data);
                         if(mdata!=="Vacia"){
-                            map.panTo(results[0].geometry.location);
-                            //window.alert(JSON.stringify(data, null, 4));
-                            var contador=0;
                             cleanMap();
                             $.mobile.changePage("#mapPage");
                             $("#mainNav").show();
+                            map.panTo(results[0].geometry.location);
+                            var contador=0;
                             mdata.forEach(function(k) {
                                 var marker = new google.maps.Marker({
                                     position: {
-                                        lat: k.latitud,
-                                        lng: k.longitud
+                                        lat: k.lat,
+                                        lng: k.lng
                                     },
-                                    //icon: iconPin,
-                                    map: map,
-                                    animation: google.maps.Animation.DROP
+                                    map: map
                                 });
+                                var image="";
+                                if(typeof k.img !== 'undefined'){
+                                    image='<img src='+k.img+' width="100%" height="100%">';
+                                };
                                 marker.addListener('click', function() {
-                                   infoWindow.setContent('<div id="content"><div id="siteNotice"></div><h2>' + k.nombre + '</h2><div id="bodyContent"><p>' + k.direccion + '</p></div></div>');
-                                   infoWindow.open(map, this);
+                                    infoWindow.setContent("<div id='content'><div id='siteNotice'></div><h2>"+k.title+"</h2>"+image+"<div id='bodyContent'><p>"+k.summary+"</p></div><i id='iP"+contador+"' class='fa fa-info-circle fa-2x' style='text-align:right;' aria-hidden='true'></i></div>");           
+                                    infoWindow.open(map, this);
+                                    $('#iP'+contador).click(function() {
+                                        navBar='#mainNav';
+                                        getInfoPlace(k.title);
+                                    });
                                 });
                                 markerArray.push(marker);
                                 contador++;
@@ -496,12 +507,12 @@ function searchPlace() {
                             document.getElementById('cleanRouteIcon').style.display = 'none';
                             document.getElementById('cleanMarkersIcon').style.display = 'inline';
                         }else{
-                            window.alert('¡No se han encontrado resultados!');
+                            window.alert(dictionary.noResultsFound);
                         }
                         $('#searchPage').spin(false);
                     });
                 } else {
-                    window.alert('La geolocalización de la ciudad ha fallado. Introduce una ciudad válida. '+status);
+                    window.alert(dictionary.cityGeolocationFail+status);
                     $('#searchPage').spin(false);
                 }
             });
@@ -514,7 +525,7 @@ function searchPlace() {
             radio: document.getElementById('B2In').value,
             lat: userPos.lat,
             lng: userPos.lng,
-            query: document.getElementById("B2Query").options[document.getElementById("B2Query").selectedIndex].value
+            language: language
         }, function(data, status) {
             var mdata = JSON.parse(data);
             if(mdata!=="Vacia"){
@@ -522,33 +533,41 @@ function searchPlace() {
                 $.mobile.changePage( "#mapPage");
                 $("#mainNav").show();
                 map.panTo(GeoMarker.getPosition());
+                var contador=0;
                 mdata.forEach(function(k) {
                     var marker = new google.maps.Marker({
                         position: {
-                            lat: k.latitud,
-                            lng: k.longitud
+                            lat: k.lat,
+                            lng: k.lng
                         },
-                        //icon: iconPin,
-                        map: map,
-                        animation: google.maps.Animation.DROP
+                        map: map
                     });
+                    var image="";
+                    if(typeof k.img !== 'undefined'){
+                        image='<img src='+k.img+' width="100%" height="100%">';
+                    };
                     marker.addListener('click', function() {
-                       infoWindow.setContent('<div id="content"><div id="siteNotice"></div><h2>' + k.nombre + '</h2><div id="bodyContent"><p>' + k.direccion + '</p></div></div>');
-                       infoWindow.open(map, this);
+                        infoWindow.setContent("<div id='content'><div id='siteNotice'></div><h2>"+k.title+"</h2>"+image+"<div id='bodyContent'><p>"+k.summary+"</p></div><i id='iP"+contador+"' class='fa fa-info-circle fa-2x' style='text-align:right;' aria-hidden='true'></i></div>");           
+                        infoWindow.open(map, this);
+                        $('#iP'+contador).click(function() {
+                            navBar='#mainNav';
+                            getInfoPlace(k.title);
+                        });
                     });
                     markerArray.push(marker);
+                    contador++;
                 });
                 directionsDisplay.setDirections({routes: []});
                 document.getElementById('cleanRouteIcon').style.display = 'none';
                 document.getElementById('cleanMarkersIcon').style.display = 'inline';
             }else{
-                window.alert('¡No se han encontrado resultados!');
+                window.alert(dictionary.noResultsFound);
             }
             $('#searchPage').spin(false);
         });
     } else if (typeQuery == 3){
         if(!document.getElementById('B3City').value){
-            window.alert('Por favor, inserta una ciudad para realizar la busqueda.');
+            window.alert(dictionary.pleaseInsertCity);
             $('#searchPage').spin(false);
         }else{
             var city;
@@ -560,63 +579,52 @@ function searchPlace() {
             $.post(url+'di_placeQuerys.php', {
                 tipoQuery: typeQuery,
                 query: city,
+                language: language
             }, function(data, status) {
                 var mdata = JSON.parse(data);
                 if(mdata!=="Vacia"){
-                    $("#cityInfoCollapsible").empty();
-                    for (var k in mdata){
-                        if (mdata.hasOwnProperty(k)) {
-                            $("#cityInfoCollapsible").append("<div data-role='collapsible' class='animateCollapsible' data-collapsed-icon='carat-d' data-expanded-icon='carat-u'><h3>"+k+"</h3>"+mdata[k]+"</div>").trigger('create');
-                        }
-                    }
+                    $('#mainNav').hide();
+                    setInfoPage(mdata, "#cityInfoCollapsible");
                     $.mobile.changePage( "#cityInfoPage");
                     $('#cityInfoPage').children('div').children('h1').text(capitalizeFirstLetter(city));
                 }else{
-                    window.alert('¡No se han encontrado resultados!');
+                    window.alert(dictionary.noResultsFound);
                 } 
                 $('#searchPage').spin(false);
             });  
         }
     }
 }
-/*Metodo para sacar lugares de interes en busqueda cercana. hay que implementar
-    alert('sumergise');
-        service.nearbySearch({
-            location: userPos,         
-            radius: document.getElementById('B2In').value,
-            //keyword: "POI",
-            types: document.getElementById("B2Type").options[document.getElementById("B2Type").selectedIndex].value
-        }, function (results, status) {
-            window.alert(status);
-            if (status === google.maps.places.PlacesServiceStatus.OK) {
-                window.alert('hemos hecho busqueda');
-                cleanMap();
-                $.mobile.changePage( "#mapPage");
-                map.panTo(GeoMarker.getPosition());
-                results.forEach(function(k) {
-                    var marker = new google.maps.Marker({
-                        position: k.geometry.location,
-                        //icon: iconPin,
-                        map: map,
-                        animation: google.maps.Animation.DROP
-                    });
-                    marker.addListener('click', function() {
-                       infoWindow.setContent('<div id="content"><div id="siteNotice"></div><h2>' + k.name, + '</h2><div id="bodyContent"><p></p></div></div>');
-                       infoWindow.open(map, this);
-                    });
-                    markerArray.push(marker);
-                });
-                directionsDisplay.setDirections({routes: []});
-                document.getElementById('cleanRouteIcon').style.display = 'none';
-                document.getElementById('cleanMarkersIcon').style.display = 'inline';
-            } else {
-                window.alert(status);
+function getInfoPlace(title){
+    $('#all').spin('loading');
+    $.post(url+'di_placeQuerys.php', {
+        title: title,
+        language: language,
+        tipoQuery: 5
+    }, function(data, status) {
+        var mdata = JSON.parse(data);
+        if(mdata!=="Vacia"){
+            $(navBar).hide();
+            setInfoPage(mdata, "#infoCollapsible");
+            $.mobile.changePage("#infoPage");
+            $('#infoPage').children('div').children('h1').text(capitalizeFirstLetter(title));
+        }else{
+            window.alert(dictionary.noInfoFound);
+        }
+        $('#all').spin(false);
+    });
+}
+function setInfoPage(data, page){
+    $(page).empty();
+        for (var k in data){
+            if (data.hasOwnProperty(k)) {
+                $(page).append("<div data-role='collapsible' class='animateCollapsible' data-collapsed-icon='carat-d' data-expanded-icon='carat-u'><h3>"+k+"</h3>"+data[k]+"</div>").trigger('create');
             }
-        });
-*/
+        }
+}
 function handleLocationError(browserHasGeolocation, infoWindow, pos){
     infoWindow.setPosition(pos);
-    infoWindow.setContent(browserHasGeolocation ? 'Error: El servicio geolocalizador falló.' : 'Error: Tu dispositivo no tiene geolocalización.');
+    infoWindow.setContent(browserHasGeolocation ? dictionary.geolocationFail : dictionary.noGeolocation);
 }
 $('#locationIcon').click(function(){
     navigator.geolocation.getCurrentPosition(function(position) {
@@ -635,11 +643,11 @@ function setRoute(routeId){
     directionsService.route(routesArray[routeId].gRoute, function(response, status) {
         if (status == google.maps.DirectionsStatus.OK) {
             directionsDisplay.setDirections(response);
-        } else alert('failed to get directions');
+        } else window.alert(dictionary.directionsFail);
         $.mobile.changePage("#mapPage", {
             reverse: true,
             changeHash: true
-        });       
+        });
     });
     $('#mainNav').show();
     document.getElementById('cleanRouteIcon').style.display = 'inline';
@@ -651,7 +659,7 @@ function getRoutes(){
     $.post(url+'di_routeLoader.php', {}, function(data, status){ 
         var mdata = JSON.parse(data);
         if(mdata=='Vacia'){
-            $('#routesCollapsible').append('<p style="text-align:center;">No hay rutas. ¿Por qué no creas una?</p>');
+            $('#routesCollapsible').append('<p style="text-align:center;">'+dictionary.noRoutes+'</p>');
             $('#routesPage').spin(false);
         }else{
             mdata.forEach(function(k) {
@@ -665,12 +673,12 @@ function getRoutes(){
                     }
                     lista=lista.concat('<li>'+nombreM+'</li>');
                 });
-                if(k.descripcion) descripcion=k.descripcion; else descripcion='Esta ruta no tiene descripción.';
+                if(k.descripcion) descripcion=k.descripcion; else descripcion=dictionary.noRouteDescription;
                 if(k.n_valoraciones!=0){
                     valoracion="<div style='float:right; padding-right:2px;'><i class='fa fa-star-half-o' aria-hidden='true'></i> "+k.valoracion.toFixed(1)+"</div>";
                 }
                 //hay que hacer query por cada id de monumento
-                $("#routesCollapsible").append("<div data-role='collapsible' class='animateCollapsible' data-collapsed-icon='carat-d' data-expanded-icon='carat-u'><h3>"+k.nombre+valoracion+"</h3><div class='ui-grid-a'><div class='ui-block-a'><p><b>Monumentos</b></p><ul class='monList'>"+lista+"</ul></div><div class='ui-block-b'><p><b>Descripción</b></p><p>"+descripcion+"</p></div></div><div class='ui-grid-a'><div class='ui-block-a'><p><b>Creada por:</b></p><div id='userName'>"+k.autor+"</div><br><div id='icons"+k._id.$id+"'><a href='#eventConfigPage' onclick='toEventSchedule(\"" +k._id.$id+ "\",\"" +k.nombre+ "\")'><i class='fa fa-calendar-plus-o fa-2x' style='color:black;'></i></a><a class='favorite"+k._id.$id+"' onclick='downloadRoute(\"" +k._id.$id+ "\")'><i class='fa fa-star fa-2x' style='color:black'></i></a></div></div><div class='ui-block-b'><div data-role='fieldcontain' class='val"+k._id.$id+"' style='padding:0;'><select data-native-menu='false' id='sel"+k._id.$id+"'><option value='5'>★★★★★</option><option value='4'>★★★★☆</option><option value='3'>★★★☆☆</option><option value='2'>★★☆☆☆</option><option value='1'>★☆☆☆☆</option><option value='0'>☆☆☆☆☆</option></select></div><button class='btn"+k._id.$id+"' onclick='saveRate(\"" +k._id.$id+"\",\""+autor+"\")'><i class='fa fa-star-half-o'></i> Valorar</button><button onclick='setRoute(\"" +k._id.$id+ "\")'>Iniciar ruta</button></div></div></div></div>").trigger('create');
+                $("#routesCollapsible").append("<div data-role='collapsible' class='animateCollapsible' data-collapsed-icon='carat-d' data-expanded-icon='carat-u'><h3>"+k.nombre+valoracion+"</h3><div class='ui-grid-a'><div class='ui-block-a'><p><b>"+dictionary.monuments+"</b></p><ul class='monList'>"+lista+"</ul></div><div class='ui-block-b'><p><b>"+dictionary.description+"</b></p><p>"+descripcion+"</p></div></div><div class='ui-grid-a'><div class='ui-block-a'><p><b>"+dictionary.createdBy+"</b></p><div id='userName'>"+k.autor+"</div><br><div id='icons"+k._id.$id+"'><a href='#eventConfigPage' onclick='toEventSchedule(\"" +k._id.$id+ "\",\"" +k.nombre+ "\")'><i class='fa fa-calendar-plus-o fa-2x' style='color:black;'></i></a><a class='favorite"+k._id.$id+"' onclick='downloadRoute(\"" +k._id.$id+ "\")'><i class='fa fa-star fa-2x' style='color:black'></i></a></div></div><div class='ui-block-b'><div data-role='fieldcontain' class='val"+k._id.$id+"' style='padding:0;'><select data-native-menu='false' id='sel"+k._id.$id+"'><option value='5'>★★★★★</option><option value='4'>★★★★☆</option><option value='3'>★★★☆☆</option><option value='2'>★★☆☆☆</option><option value='1'>★☆☆☆☆</option><option value='0'>☆☆☆☆☆</option></select></div><button class='btn"+k._id.$id+"' onclick='saveRate(\"" +k._id.$id+"\",\""+autor+"\")'><i class='fa fa-star-half-o'></i> "+dictionary.rate+"</button><button onclick='setRoute(\"" +k._id.$id+ "\")'>"+dictionary.beginRoute+"</button></div></div></div></div>").trigger('create');
                 routesArray[k._id.$id]=k;
                 if(rutasBajadas.indexOf(k._id.$id)!==-1||autor==k.autor){
                     $('.favorite'+k._id.$id).hide();
@@ -689,7 +697,7 @@ function getRoutes(){
 }
 function searchRoutes(){
     if(!document.getElementById('RName').value&&!document.getElementById('RCity').value&&$('input:radio[name=RVal]:checked').length <= 0){
-        window.alert('Por favor, selecciona al menos un parámetro para realizar la busqueda.');
+        window.alert(dictionary.pleaseSelectParameter);
     }else{
         $('#routesPage').spin('loading');
         var descripcion, valoracion;
@@ -719,12 +727,12 @@ function searchRoutes(){
                         }
                         lista=lista.concat('<li>'+nombreM+'</li>');
                     });
-                    if(k.descripcion) descripcion=k.descripcion; else descripcion='Esta ruta no tiene descripción.';
+                    if(k.descripcion) descripcion=k.descripcion; else descripcion=dictionary.noRouteDescription;
                     if(k.n_valoraciones!=0){
                         valoracion="<div style='float:right; padding-right:2px;'><i class='fa fa-star-half-o' aria-hidden='true'></i> "+k.valoracion.toFixed(1)+"</div>";
                     }
                     //hay que hacer query por cada id de monumento
-                    $("#routeResultCollapsible").append("<div data-role='collapsible' class='animateCollapsible' data-collapsed-icon='carat-d' data-expanded-icon='carat-u'><h3>"+k.nombre+valoracion+"</h3><div class='ui-grid-a'><div class='ui-block-a'><p><b>Monumentos</b></p><ul class='monList'>"+lista+"</ul></div><div class='ui-block-b'><p><b>Descripción</b></p><p>"+descripcion+"</p></div></div><div class='ui-grid-a'><div class='ui-block-a'><p><b>Creada por:</b></p><div id='userName'>"+k.autor+"</div><br><div id='icons"+k._id.$id+"'><a href='#eventConfigPage' onclick='toEventSchedule(\"" +k._id.$id+ "\",\"" +k.nombre+ "\")'><i class='fa fa-calendar-plus-o fa-2x'></i></a><a class='favorite"+k._id.$id+"' onclick='downloadRoute(\"" +k._id.$id+ "\")'><i class='fa fa-star fa-2x'></i></a></div></div><div class='ui-block-b'><div data-role='fieldcontain' class='val"+k._id_$id+"' style='padding:0;'><select data-native-menu='false' id='sel"+k._id.$id+"'><option value='5'>★★★★★</option><option value='4'>★★★★☆</option><option value='3'>★★★☆☆</option><option value='2'>★★☆☆☆</option><option value='1'>★☆☆☆☆</option><option value='0'>☆☆☆☆☆</option></select></div><button class='btn"+k._id.$id+"' onclick='saveRate(\"" +k._id.$id+"\",\""+autor+"\")'><i class='fa fa-star-half-o'></i> Valorar</button><button onclick='setRoute(\"" +k._id.$id+ "\")'>Iniciar ruta</button></div></div></div></div>").trigger('create');
+                    $("#routeResultCollapsible").append("<div data-role='collapsible' class='animateCollapsible' data-collapsed-icon='carat-d' data-expanded-icon='carat-u'><h3>"+k.nombre+valoracion+"</h3><div class='ui-grid-a'><div class='ui-block-a'><p><b>"+dictionary.monuments+"</b></p><ul class='monList'>"+lista+"</ul></div><div class='ui-block-b'><p><b>"+dictionary.description+"</b></p><p>"+descripcion+"</p></div></div><div class='ui-grid-a'><div class='ui-block-a'><p><b>"+dictionary.createdBy+"</b></p><div id='userName'>"+k.autor+"</div><br><div id='icons"+k._id.$id+"'><a href='#eventConfigPage' onclick='toEventSchedule(\"" +k._id.$id+ "\",\"" +k.nombre+ "\")'><i class='fa fa-calendar-plus-o fa-2x'></i></a><a class='favorite"+k._id.$id+"' onclick='downloadRoute(\"" +k._id.$id+ "\")'><i class='fa fa-star fa-2x'></i></a></div></div><div class='ui-block-b'><div data-role='fieldcontain' class='val"+k._id_$id+"' style='padding:0;'><select data-native-menu='false' id='sel"+k._id.$id+"'><option value='5'>★★★★★</option><option value='4'>★★★★☆</option><option value='3'>★★★☆☆</option><option value='2'>★★☆☆☆</option><option value='1'>★☆☆☆☆</option><option value='0'>☆☆☆☆☆</option></select></div><button class='btn"+k._id.$id+"' onclick='saveRate(\"" +k._id.$id+"\",\""+autor+"\")'><i class='fa fa-star-half-o'></i> "+dictionary.rate+"</button><button onclick='setRoute(\"" +k._id.$id+ "\")'>"+dictionary.beginRoute+"</button></div></div></div></div>").trigger('create');
                     routesArray[k._id.$id]=k; 
                     if(rutasBajadas.indexOf(k._id.$id)!==-1||autor==k.autor){
                         $('.favorite'+k._id.$id).hide();
@@ -758,7 +766,7 @@ function addMarker(marker) {
             rDestination = marker.position;
             placeMarker(marker);
         } else {
-            window.alert("¡Has alcanzado el tamaño máximo de ruta! Por favor, elimina algún punto para añadir otro.");
+            window.alert(dictionary.maxRouteSizeReached);
         }
     }   
 }
@@ -783,7 +791,7 @@ function placeMarker(marker){
 }
 function undoMarker() {
     if(rMarkerArray.length==0){
-        window.alert('No hay puntos para quitar.');
+        window.alert(dictionary.noMarkersToRemove);
     }else{
         if(rMarkerArray.length==1){
             rOrigin = null
@@ -804,12 +812,12 @@ function calcRoute() {
     $('#routeCreatorPage').spin('loading');
     cleanRouteMap();
     if (rOrigin == null) {
-        window.alert("¡No puedes crear una ruta sin un punto de inicio!");
+        window.alert(dictionary.youCantCreateRouteBeginning);
         $('#routeCreatorPage').spin(false);
         return;
     }
     if (rDestination == null) {
-        window.alert("Añade un punto de final para acabar la ruta.");
+        window.alert(dictionary.addEndToFinish);
         $('#routeCreatorPage').spin(false);
         return;
     }
@@ -856,10 +864,10 @@ function resetRoute() {
 function saveRoute(){
     $('#routeCreator2Page').spin('loading');
     if (!document.getElementById('routeName').value) {
-        window.alert('Introduce un nombre a tu ruta para guardarla.');
+        window.alert(dictionary.nameRouteToSave);
         $('#routeCreator2Page').spin(false);
     }else if (!document.getElementById('cityName').value) {
-        window.alert('Por favor, introduce una ciudad principal para indicar por donde transcurre la ruta.');
+        window.alert(dictionary.pleaseRouteCity);
         $('#routeCreator2Page').spin(false);
     }else{
         var infoPlaces=[];
@@ -869,7 +877,7 @@ function saveRoute(){
                 place.nombre=element.nombre;
                 infoPlaces.push(place);
             }else{
-                place.nombre='Par de coord.'
+                place.nombre=dictionary.pairCoordinates
                 infoPlaces.push(place);
             }
         });
@@ -882,7 +890,7 @@ function saveRoute(){
             autor: autor
         }, function(data, status) {
             if(data.substring(0,7)=='SUCCESS'){
-                window.alert('¡Ruta guardada con éxito!');
+                window.alert(dictionary.saveRouteSuccess);
                 $.mobile.changePage("#mapPage");
                 $("#mainNav").show();
                 resetRoute();
@@ -901,7 +909,7 @@ function saveRoute(){
                 loadMyRoutes();
                 getRoutes();
             }else{
-                window.alert('Algo falló O.o');
+                window.alert(dictionary.unexpectedFailure);
             }
             $('#routeCreator2Page').spin(false);
         });
@@ -924,14 +932,14 @@ function toRouteCreator(){
         $("#mainNav").hide();
         $("#routeCreatorNav").show();
     }else{
-        window.alert('Por favor, conecta tu movil a internet para crear rutas.')
+        window.alert(dictionary.pleaseInternetToCreate)
     }
     $('#routesPage').spin(false);
 }
 function searchRCPlace() {
     $('#searchRCPage').spin('loading');
     if(!document.getElementById('RCCity').value){
-        window.alert('Por favor, inserta una ciudad para realizar la búsqueda.');
+        window.alert(dictionary.pleaseInsertCity);
         $('#searchRCPage').spin(false);
     }else{
         geocoder.geocode({'address': document.getElementById('RCCity').value}, function(results, status) {
@@ -973,7 +981,7 @@ function searchRCPlace() {
                                     marker.setMap(null);
                                 });
                                 $('#iP'+contador).click(function() {
-                                    $.mobile.changePage("#infoRCPage"); 
+                                    $.mobile.changePage("#infoPage"); 
                                     $("#routeCreatorNav").hide();
                                 });
                             });       
@@ -986,12 +994,12 @@ function searchRCPlace() {
                         $.mobile.changePage("#routeCreatorPage");
                         $("#routeCreatorNav").show();
                     }else{
-                        window.alert('¡No se han encontrado resultados!');
+                        window.alert(dictionary.noResultsFound);
                     } 
                     $('#searchRCPage').spin(false);
                 });
             } else {
-                window.alert('La geolocalización de la ciudad ha fallado. Introduce una ciudad válida. ');
+                window.alert(dictionary.cityGeolocationFail);
                 $('#searchRCPage').spin(false);
             }         
         });
@@ -1020,13 +1028,13 @@ function loadMyRoutes(){
                             }
                             lista=lista.concat('<li>'+nombreM+'</li>');
                         });
-                        if(k.descripcion) descripcion=k.descripcion; else descripcion='Esta ruta no tiene descripción.';
+                        if(k.descripcion) descripcion=k.descripcion; else descripcion=dictionary.noRouteDescription;
                         //hay que hacer query por cada id de monumento
-                        $("#myRoutesCollapsible").append("<div data-role='collapsible' class='animateCollapsible' data-collapsed-icon='carat-d' data-expanded-icon='carat-u'><h3>"+k.nombre+"</h3><div class='ui-grid-a'><div class='ui-block-a'><p><b>Monumentos</b></p><ul class='monList'>"+lista+"</ul></div><div class='ui-block-b'><p><b>Descripción</b></p><p>"+descripcion+"</p></div></div><div class='ui-grid-a'><div class='ui-block-a'><div id='icons"+id+"'><a href='#eventConfigPage' onclick='toEventSchedule(\"" +id+ "\",\"" +k.nombre+ "\")'><i class='fa fa-calendar-plus-o fa-2x' style='color:black;'></i></a><a onclick='deleteRoute(\"" +id+ "\")'><i class='fa fa-trash-o fa-2x' style='color:black'></i></a></div><br></div><div class='ui-block-b'><button onclick='setRoute(\"" +id+ "\")'>Iniciar ruta</button></div></div></div></div>").trigger('create');
+                        $("#myRoutesCollapsible").append("<div data-role='collapsible' class='animateCollapsible' data-collapsed-icon='carat-d' data-expanded-icon='carat-u'><h3>"+k.nombre+"</h3><div class='ui-grid-a'><div class='ui-block-a'><p><b>"+dictionary.monuments+"</b></p><ul class='monList'>"+lista+"</ul></div><div class='ui-block-b'><p><b>"+dictionary.description+"</b></p><p>"+descripcion+"</p></div></div><div class='ui-grid-a'><div class='ui-block-a'><div id='icons"+id+"'><a href='#eventConfigPage' onclick='toEventSchedule(\"" +id+ "\",\"" +k.nombre+ "\")'><i class='fa fa-calendar-plus-o fa-2x' style='color:black;'></i></a><a onclick='deleteRoute(\"" +id+ "\")'><i class='fa fa-trash-o fa-2x' style='color:black'></i></a></div><br></div><div class='ui-block-b'><button onclick='setRoute(\"" +id+ "\")'>"+dictionary.beginRoute+"</button></div></div></div></div>").trigger('create');
                     }
                 }
             }else{
-                $("#myRoutesCollapsible").append('<p style="text-align:center;">No hay rutas aún creadas en este dispositivo.</p>');
+                $("#myRoutesCollapsible").append('<p style="text-align:center;">'+dictionary.noRoutes+'</p>');
             }
         });
     });
@@ -1039,7 +1047,7 @@ function deleteRoute(routeId){
         db.transaction(function (tx) {
             tx.executeSql("DELETE FROM localMyRoutes WHERE id=?", [routeId]);
         });
-        window.alert('¡Ruta borrada con éxito!');
+        window.alert(dictionary.successDeleteRoute);
         getRoutes();
         loadMyRoutes();
     });
@@ -1050,7 +1058,7 @@ function downloadRoute(routeId){
         tx.executeSql("INSERT INTO downloadedRoutes (id, route) VALUES (?,?)", [routeId, JSON.stringify(routesArray[routeId])]);
     });
     rutasBajadas.push(routeId);
-    window.alert('¡Ruta descargada y añadida a favoritos!');
+    window.alert(dictionary.successDownloadRoute);
     loadDownloadedRoutes();
     $(".favorite"+routeId).hide();
     $('#routesPage').spin(false);
@@ -1079,7 +1087,7 @@ function loadDownloadedRoutes(routeId){
                     }
                     if(k.descripcion) descripcion=k.descripcion; else descripcion='Esta ruta no tiene descripción.';
                     //hay que hacer query por cada id de monumento
-                    $("#favoriteRoutesCollapsible").append("<div data-role='collapsible' class='animateCollapsible' data-collapsed-icon='carat-d' data-expanded-icon='carat-u'><h3>"+k.nombre+valoracion+"</h3><div class='ui-grid-a'><div class='ui-block-a'><p><b>Monumentos</b></p><ul class='monList'>"+lista+"</ul></div><div class='ui-block-b'><p><b>Descripción</b></p><p>"+descripcion+"</p></div></div><div class='ui-grid-a'><div class='ui-block-a'><p><b>Creada por:</b></p><div id='userName'>"+k.autor+"</div><br><div id='icons"+k._id.$id+"'><a href='#eventConfigPage' onclick='toEventSchedule(\"" +k._id.$id+ "\",\"" +k.nombre+ "\")'><i class='fa fa-calendar-plus-o fa-2x' style='color:black;'></i></a><a onclick='removeRoute(\"" +k._id.$id+ "\")'><span class='fa-stack fa-lg'><i class='fa fa-star fa-stack-2x' style='color:black;'></i><i class='fa fa-times fa-stack-2x' style='color:red;'></i></span></a></div><br></div><div class='ui-block-b'><div data-role='fieldcontain' style='padding:0;'><select data-native-menu='false' id='sel"+k._id.$id+"'><option value='5'>★★★★★</option><option value='4'>★★★★☆</option><option value='3'>★★★☆☆</option><option value='2'>★★☆☆☆</option><option value='1'>★☆☆☆☆</option><option value='0'>☆☆☆☆☆</option></select></div><button class='btn"+k._id.$id+"' onclick='saveRate(\"" +k._id.$id+"\",\""+autor+"\")'><i class='fa fa-star-half-o'></i> Valorar</button><button onclick='setRoute(\"" +k._id.$id+ "\")'>Iniciar ruta</button></div></div></div></div>").trigger('create');
+                    $("#favoriteRoutesCollapsible").append("<div data-role='collapsible' class='animateCollapsible' data-collapsed-icon='carat-d' data-expanded-icon='carat-u'><h3>"+k.nombre+valoracion+"</h3><div class='ui-grid-a'><div class='ui-block-a'><p><b>"+dictionary.monuments+"</b></p><ul class='monList'>"+lista+"</ul></div><div class='ui-block-b'><p><b>"+dictionary.description+"</b></p><p>"+descripcion+"</p></div></div><div class='ui-grid-a'><div class='ui-block-a'><p><b>"+dictionary.createdBy+"</b></p><div id='userName'>"+k.autor+"</div><br><div id='icons"+k._id.$id+"'><a href='#eventConfigPage' onclick='toEventSchedule(\"" +k._id.$id+ "\",\"" +k.nombre+ "\")'><i class='fa fa-calendar-plus-o fa-2x' style='color:black;'></i></a><a onclick='removeRoute(\"" +k._id.$id+ "\")'><span class='fa-stack fa-lg'><i class='fa fa-star fa-stack-2x' style='color:black;'></i><i class='fa fa-times fa-stack-2x' style='color:red;'></i></span></a></div><br></div><div class='ui-block-b'><div data-role='fieldcontain' style='padding:0;'><select data-native-menu='false' id='sel"+k._id.$id+"'><option value='5'>★★★★★</option><option value='4'>★★★★☆</option><option value='3'>★★★☆☆</option><option value='2'>★★☆☆☆</option><option value='1'>★☆☆☆☆</option><option value='0'>☆☆☆☆☆</option></select></div><button class='btn"+k._id.$id+"' onclick='saveRate(\"" +k._id.$id+"\",\""+autor+"\")'><i class='fa fa-star-half-o'></i> "+dictionary.rate+"</button><button onclick='setRoute(\"" +k._id.$id+ "\")'>"+dictionary.beginRoute+"</button></div></div></div></div>").trigger('create');
                     routesArray[k._id.$id]=k; 
                     if($.inArray(k._id.$id, rutasValoradas)!==-1){
                         $(".btn"+k._id.$id).prop("disabled",true);
@@ -1087,7 +1095,7 @@ function loadDownloadedRoutes(routeId){
                 }
                 $('#favoriteRoutesCollapsible').find('div[data-role=collapsible]').collapsible({refresh:true});
             }else{
-                $("#favoriteRoutesCollapsible").append('<p style="text-align:center;">No hay rutas descargadas.</p>');
+                $("#favoriteRoutesCollapsible").append('<p style="text-align:center;">'+dictionary.noDownloadedRoutes+'</p>');
             }
         });
     });
@@ -1110,9 +1118,12 @@ function saveRate(routeId, autor){
         route: routeId,
         autor: autor
     }, function(data, status){
-        console.log(data);
-        window.alert('¡Valoración guardada con éxito!');
-        $(".btn"+routeId).prop("disabled",true);
+        if(data=="SUCCESS"){
+            window.alert(dictionary.successRate);
+            $(".btn"+routeId).prop("disabled",true);
+        }else{
+            window.alert(dictionary.unexpectedFailure);
+        }
     });    
 }
 //CALENDARIO
@@ -1123,7 +1134,7 @@ function toEventSchedule(routeId, routeName){
 }
 function addEvent(){
     if(!$('#dateEvent').val()){
-        window.alert('Por favor, introduce un dia para realizar la ruta.');
+        window.alert(dictionary.pleaseInsertDay);
     }else{
         var event= {
             id: $('#idEvent').val(),
@@ -1155,9 +1166,9 @@ function deleteUser(){
                 tx.executeSql("DELETE FROM localUsers WHERE nick=?", [localStorage.getItem('username')]);
                 tx.executeSql("DROP TABLE localMyRoutes");
             });
-            window.alert('Cuenta borrada con exito. ¡Esperamos volver a verte pronto!');
+            window.alert(dictionary.successDeleteUser);
         }else{
-            window.alert('Algo falló en el borrado. Vuelve a intentarlo mas tarde.');
+            window.alert(dictionary.unexpectedFailure);
         }
     });
     logOut();
@@ -1166,7 +1177,7 @@ function testConnection() {
     jQuery.ajaxSetup({async:false});
     re="";
     r=Math.round(Math.random() * 10000);
-    $.get("http://192.168.1.115/DiscoverIt/www/test.jpg",{subins:r},function(d){
+    $.get("http://192.168.1.110/DiscoverIt/www/test.jpg",{subins:r},function(d){
         re=true;
     }).error(function(){
         re=false;
@@ -1176,14 +1187,14 @@ function testConnection() {
 function checkIfOnline(){
     $('#all').spin('loading');
     if(testConnection()==false){
-        if (window.location.href.indexOf("routeCreatorPage") > -1 || window.location.href.indexOf("routeCreator2Page") > -1 || window.location.href.indexOf("searchRCPage") > -1 || window.location.href.indexOf("infoRCPage") > -1){
-            window.alert('Se ha perdido la conexión a internet. Por favor, conecta el dispositivo de nuevo para completar la ruta.');
+        if (window.location.href.indexOf("routeCreatorPage") > -1 || window.location.href.indexOf("routeCreator2Page") > -1 || window.location.href.indexOf("searchRCPage") > -1 || window.location.href.indexOf("infoPage") > -1){
+            window.alert(dictionary.lostConnectionRC);
             $.mobile.changePage("#routesPage");
             $('#mainNav').show();
             $('#routeCreatorNav').hide();
         }
         if (window.location.href.indexOf("searchPage") > -1){
-            window.alert('Se ha perdido la conexión a internet. Por favor, conecta el dispositivo de nuevo para realizar la búsqueda.');
+            window.alert(dictionary.lostConnectionRCS);
             $.mobile.changePage("#mapPage");
             $('#mainNav').show();
         }
@@ -1200,26 +1211,11 @@ function checkIfOnline(){
     }
     $('#all').spin(false);
 }
-function sendEmail(){
-    cordova.plugins.email.isAvailable(function (hasAccount) {  
-        alert('siv');
-        cordova.plugins.email.open({
-            to:      'max@mustermann.de',
-            cc:      'erika@mustermann.de',
-            bcc:     ['john@doe.com', 'jane@doe.com'],
-            subject: 'Greetings',
-            body:    'How are you? Nice greetings from Leipzig'
-        })
-    }, function () {
-        alert('error');
-    });
-
-}
 //AUTOCOMPLETAR Y DETALLES GRÁFICOS
 $("#B3City").autocomplete({
     source: function(request, response) {
         $.ajax({
-            url: "https://es.wikivoyage.org/w/api.php",
+            url: "https://"+language+".wikivoyage.org/w/api.php",
             dataType: "jsonp",
             data: {
                 'action': "opensearch",
@@ -1240,7 +1236,7 @@ $(document).on("pagecontainershow", function () {
     $('#mainNav ul').removeClass('ui-state-disabled');
     $('#routeCreatorNav ul').removeClass('ui-state-disabled');
 });
-$('#searchPage, #routesPage, #cityInfoPage, #routeResultPage, #myRoutesPage').on("pagecreate", function(event, ui) {
+$('#searchPage, #routesPage, #cityInfoPage, #routeResultPage, #myRoutesPage, #infoPage').on("pageshow", function(event, ui) {
     $(".animateCollapsible .ui-collapsible-heading-toggle").on("click", function (e) { 
         var current = $(this).closest(".ui-collapsible");             
         if (current.hasClass("ui-collapsible-collapsed")) {
@@ -1253,10 +1249,10 @@ $('#searchPage, #routesPage, #cityInfoPage, #routeResultPage, #myRoutesPage').on
     });
 });
 $('#routeCreatorPage').on("pageshow", function(event, ui) {
-     google.maps.event.trigger(routeMap, "resize");
+    google.maps.event.trigger(routeMap, "resize");
 });
-$('#mapPage').on("pageshow", function(event, ui) {
-     //google.maps.event.trigger(map, "resize");
+$("#mapPage").on("pageshow" , function() {
+    google.maps.event.trigger(map, "resize");
 });
 $('#calendarPage').on("pageshow", function(event, ui) {
     $('#calendar').fullCalendar('render');

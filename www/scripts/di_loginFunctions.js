@@ -1,30 +1,40 @@
 document.addEventListener('deviceready', function() {
-    if(localStorage.getItem('username')!==null){
-        window.alert('¡Bienvenido, '+localStorage.getItem('username')+'!');
-        window.location.replace("main.html");
-    }else{
-        $.base64.utf8encode = true;
-        checkIfOnline();
-        db = openDatabase("local.db", '1.0', "LocalDB", 2 * 1024 * 1024);
-        db.transaction(function (tx) {
-            tx.executeSql("CREATE TABLE IF NOT EXISTS localUsers (nick text primary key, pass text)");
+    $("[data-localize]").localize("lang", {pathPrefix: "languages", skipLanguage: ["es","es-ES"]});
+    $.getJSON('./languages/js-'+language+'.json', function(json) {
+        dictionary=json;
+        console.log(dictionary);
+    }).fail(function() {
+        $.getJSON('./languages/js-en.json', function(json) {
+            dictionary=json;
         });
-        //var timer=window.setInterval(checkIfOnline,5000);
-        window.StatusBar.overlaysWebView(false);
-        window.StatusBar.backgroundColorByHexString('#000000');
-    }
+    }).always(function(){
+        if(localStorage.getItem('username')!==null){
+            window.alert('¡'+dictionary.welcome+', '+localStorage.getItem('username')+'!');
+            window.location.replace("main.html");
+        }else{
+            $.base64.utf8encode = true;
+            checkIfOnline();
+            db = openDatabase("local.db", '1.0', "LocalDB", 2 * 1024 * 1024);
+            db.transaction(function (tx) {
+                tx.executeSql("CREATE TABLE IF NOT EXISTS localUsers (nick text primary key, pass text)");
+            });
+            //var timer=window.setInterval(checkIfOnline,5000);
+            window.StatusBar.overlaysWebView(false);
+            window.StatusBar.backgroundColorByHexString('#000000');
+        }
+    });
 });
 $.fn.spin.presets.loading = {
     lines: 15, length: 41, width: 14, radius: 42, scale: 0.75, corners: 1, color: '#000', opacity: 0.25, rotate: 0, direction: 1, speed: 1, trail: 60, fps: 20, zIndex: 2e9, className: 'spinner', top: '50%', left: '50%', shadow: true, hwaccel: false, position: 'absolute'
 };
-var url='http://192.168.1.115/DiscoverIt/www/php/';
+var url='http://192.168.1.110/DiscoverIt/www/php/', dictionary, language = window.navigator.language.substring(0, 2);
 //var url='http://esp.uem.es:8000/descubrelo/';
 function confirmRegistry() {
     if(document.getElementById('username').value){
         if(!document.getElementById('password').value){
-            window.alert('Por favor, introduce una contraseña');
+            window.alert(dictionary.pleasePass);
         }else if(document.getElementById('password').value != document.getElementById('password-confirm').value){
-            window.alert('¡Las contraseñas no coinciden!');
+            window.alert(dictionary.passNotMatch);
         }else{
             $('#signUpPage').spin('loading');
             $.post(url+'di_loginFunctions.php', {
@@ -33,27 +43,27 @@ function confirmRegistry() {
                 confirmarRegistro: true
             }, function(data, status) {
                 if(data=='Usuario existente'){
-                    window.alert('Ya existe un usuario con ese nombre. Por favor, introduce otro nombre o inicia sesión si eres este usuario.');
+                    window.alert(dictionary.alreadyExistsUser);
                 }else if(data=="Registro exitoso"){
                     var encodedPass = $.base64.encode(document.getElementById('password').value, true);
                     db.transaction(function (tx) {
                         tx.executeSql("INSERT INTO localUsers (nick, pass) VALUES (?,?)", [document.getElementById('username').value, encodedPass]);
                     });
-                    window.alert('¡Usuario registrado con éxito!');
+                    window.alert(dictionary.successRegistration);
                     $.mobile.changePage("#loginPage");
                 }else{
-                    window.alert('Algo ha fallado en el registro. Por favor intentelo de nuevo mas tarde.');
+                    window.alert(dictionary.failRegistration);
                 }
                 $('#signUpPage').spin(false);
             });  
         }
     }else{
-        window.alert('Introduce un nombre de usuario, por favor');
+        window.alert(dictionary.pleaseUname);
     }
 }
 function confirmLogin () {
     if(!document.getElementById('log-password').value){
-        window.alert('Introduce la contraseña, por favor');
+        window.alert(dictionary.pleasePass);
     }else{
         $('#loginPage').spin('loading');
         db.transaction(function (tx) {
@@ -61,16 +71,16 @@ function confirmLogin () {
                 if(results.rows.length > 0) {
                     var decodedPass = $.base64.decode(results.rows.item(0).pass, true);
                     if(decodedPass==document.getElementById('log-password').value){
-                        window.alert('¡Login realizado con éxito!');
+                        window.alert(dictionary.successLogin);
                         localStorage.setItem('username', document.getElementById('log-uname').value);
                         window.location.replace("main.html");
                     }else{
-                        window.alert('Contraseña errónea. Por favor, introducela de nuevo.');
+                        window.alert(dictionary.wrongPass);
                     }
                     $('#loginPage').spin(false);
                 }else{
                     if(testConnection()===false){
-                        window.alert('Lo sentimos, ese nombre no esta en la base de datos local. Conéctate a internet para comprobarlo con la base online.');
+                        window.alert(dictionary.missingUname);
                         $('#loginPage').spin(false);
                     }else{
                         $.post(url+'di_loginFunctions.php', {
@@ -81,12 +91,12 @@ function confirmLogin () {
                             if(data=="Login exitoso"){
                                 tx.executeSql("INSERT INTO localUsers (nick, pass) VALUES (?,?)", [document.getElementById('log-uname').value, $.base64.encode(document.getElementById('log-password').value, true)]);
                                 localStorage.setItem('username', document.getElementById('log-uname').value);
-                                window.alert('¡Login realizado con éxito!');
+                                window.alert(dictionary.successLogin);
                                 window.location.replace("main.html");
                             }else if(data=="Login fallido"){
-                                window.alert('Usuario o contraseña errónea. Por favor, introduce de nuevo las credenciales.');
+                                window.alert(dictionary.wrongCredentials);
                             }else{
-                                window.alert('Algo falló en el login. Por favor, intentalo de nuevo mas tarde');
+                                window.alert(dictionary.failLogin);
                             } 
                         });  
                         $('#loginPage').spin(false);
@@ -104,7 +114,7 @@ function testConnection() {
     jQuery.ajaxSetup({async:false});
     re="";
     r=Math.round(Math.random() * 10000);
-    $.get("http://192.168.1.115/DiscoverIt/www/test.jpg",{subins:r},function(d){
+    $.get("http://192.168.1.110/DiscoverIt/www/test.jpg",{subins:r},function(d){
         re=true;
     }).error(function(){
         re=false;
@@ -114,7 +124,7 @@ function testConnection() {
 function checkIfOnline(){
     if(testConnection()===false){
         if (window.location.href.indexOf("signUpPage") > -1 ) {
-            window.alert('Se ha perdido la conexión a internet. Por favor, conecta el dispositivo de nuevo para realizar el registro.');
+            window.alert(dictionary.lostConnectionR);
             $.mobile.changePage( "#landingPage");
         }
         $("#toSignUp").button().button('disable');
