@@ -5,4 +5,4 @@ My final project for my Computer Engineering degree on 2017. Discover the world 
 - Sightseeing routes creation and sharing
 - Basic login system
 - Created with Intel XDK and the Cordova.js framework for multiplatform operation.
-- SQLite and MongoDB used for registering of Users and storing of information on the places to visit
+- SQLite and MongoDB used for registering of Users and storage of information on the places to visit
